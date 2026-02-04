@@ -3,19 +3,14 @@ import '../../../../core/error/failure.dart';
 import '../../../../core/error/result.dart';
 import '../../domain/entities/auth_user.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../datasources/auth_local_data_source.dart';
 import '../datasources/auth_remote_data_source.dart';
 
 class AuthRepositoryImpl implements IAuthRepository {
   final IAuthRemoteDataSource remoteDataSource;
-  final IAuthLocalDataSource localDataSource;
 
   AuthRepositoryImpl({
     required this.remoteDataSource,
-    required this.localDataSource,
   });
-
-
 
   @override
   Future<Result<AuthUser>> signInWithGoogle() async {
@@ -34,7 +29,6 @@ class AuthRepositoryImpl implements IAuthRepository {
   Future<Result<void>> logout() async {
     try {
       await remoteDataSource.logout();
-      await localDataSource.clear();
       return const Result.success(null);
     } catch (e) {
       return Result.failure(CacheFailure(e.toString()));
@@ -52,3 +46,4 @@ class AuthRepositoryImpl implements IAuthRepository {
     }
   }
 }
+

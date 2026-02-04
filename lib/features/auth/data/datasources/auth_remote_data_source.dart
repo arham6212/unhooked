@@ -27,7 +27,6 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
     
     final googleUser = await gsi.GoogleSignIn.instance.authenticate();
     
-    // In 7.x, account.authentication is synchronous
     final googleAuth = googleUser.authentication;
     final idToken = googleAuth.idToken;
 
@@ -38,7 +37,6 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
     final response = await _supabase.auth.signInWithIdToken(
       provider: OAuthProvider.google,
       idToken: idToken,
-      // accessToken is optional for Google in many cases, or can be fetched via authorizationClient if needed
     );
 
     if (response.user != null) {
