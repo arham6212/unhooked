@@ -15,31 +15,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     required this.localDataSource,
   });
 
-  @override
-  Future<Result<AuthUser>> login(String email, String password) async {
-    try {
-      final userModel = await remoteDataSource.login(email, password);
-      if (userModel != null) {
-        return Result.success(userModel);
-      }
-      return const Result.failure(AuthFailure('Invalid credentials.'));
-    } catch (e) {
-      return Result.failure(ServerFailure(e.toString()));
-    }
-  }
 
-  @override
-  Future<Result<AuthUser>> signUp(String email, String password) async {
-    try {
-      final userModel = await remoteDataSource.signUp(email, password);
-      if (userModel != null) {
-        return Result.success(userModel);
-      }
-      return const Result.failure(AuthFailure('Sign up failed.'));
-    } catch (e) {
-      return Result.failure(ServerFailure(e.toString()));
-    }
-  }
 
   @override
   Future<Result<AuthUser>> signInWithGoogle() async {

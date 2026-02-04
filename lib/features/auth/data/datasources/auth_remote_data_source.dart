@@ -4,8 +4,6 @@ import '../../../../core/config/app_config.dart';
 import '../models/auth_user_model.dart';
 
 abstract class IAuthRemoteDataSource {
-  Future<AuthUserModel?> login(String email, String password);
-  Future<AuthUserModel?> signUp(String email, String password);
   Future<AuthUserModel?> signInWithGoogle();
   Future<void> logout();
 }
@@ -18,35 +16,7 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
     await _supabase.auth.signOut();
   }
 
-  @override
-  Future<AuthUserModel?> login(String email, String password) async {
-    final response = await _supabase.auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
-    if (response.user != null) {
-      return AuthUserModel(
-        id: response.user!.id,
-        email: response.user!.email ?? '',
-      );
-    }
-    return null;
-  }
 
-  @override
-  Future<AuthUserModel?> signUp(String email, String password) async {
-    final response = await _supabase.auth.signUp(
-      email: email,
-      password: password,
-    );
-    if (response.user != null) {
-      return AuthUserModel(
-        id: response.user!.id,
-        email: response.user!.email ?? '',
-      );
-    }
-    return null;
-  }
 
   @override
   Future<AuthUserModel?> signInWithGoogle() async {
