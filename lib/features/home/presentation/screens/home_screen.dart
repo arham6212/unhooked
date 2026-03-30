@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import 'benefits_timeline_screen.dart';
 
 // --- Premium layout
 const _kPagePadding = 20.0;
@@ -97,6 +98,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           _startDate = DateTime.now();
                           _elapsed = Duration.zero;
                         });
+                      },
+                      onCounterTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => BenefitsTimelineScreen(
+                              currentDays: _elapsed.inDays,
+                            ),
+                          ),
+                        );
                       },
                     ),
                     const SizedBox(height: 16),
@@ -261,6 +271,7 @@ class _MainCard extends StatelessWidget {
     required this.bestStreak,
     required this.averageStreak,
     required this.onResetTimer,
+    this.onCounterTap,
   });
 
   final Duration elapsed;
@@ -268,6 +279,7 @@ class _MainCard extends StatelessWidget {
   final int bestStreak;
   final int averageStreak;
   final VoidCallback onResetTimer;
+  final VoidCallback? onCounterTap;
 
   @override
   Widget build(BuildContext context) {
@@ -288,72 +300,91 @@ class _MainCard extends StatelessWidget {
         ],
       ),
       clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '$currentStreak',
-                        style: const TextStyle(
-                          fontSize: 42,
-                          fontWeight: FontWeight.w800,
-                          color: _kOnPrimary,
-                          height: 1.0,
-                          letterSpacing: -1,
-                        ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onCounterTap,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: .start,
+                            children: [
+                              Text(
+                                '$currentStreak',
+                                style: const TextStyle(
+                                  fontSize: 42,
+                                  fontWeight: FontWeight.w800,
+                                  color: _kOnPrimary,
+                                  height: 1.0,
+                                  letterSpacing: -1,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  SizedBox(width: 12),
+                                  const Text(
+                                    'days',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: _kOnPrimaryMuted,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Current Streak',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: _kOnPrimaryMuted,
+                            ),
+                          ),
+                          Text(
+                            'Best: $bestStreak days',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: _kOnPrimaryMuted,
+                            ),
+                          ),
+                          Text(
+                            'Average: $averageStreak days',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: _kOnPrimaryMuted,
+                            ),
+                          ),
+                        ],
                       ),
-                      const Text(
-                        'days',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: _kOnPrimaryMuted,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Current Streak',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: _kOnPrimaryMuted,
-                        ),
-                      ),
-                      Text(
-                        'Best: $bestStreak days',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: _kOnPrimaryMuted,
-                        ),
-                      ),
-                      Text(
-                        'Average: $averageStreak days',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: _kOnPrimaryMuted,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+
+                    _DailyGrid(),
+                  ],
                 ),
-                _DailyGrid(),
-              ],
+              ),
             ),
-          ),
-          _RecoveryTimerSection(
-            elapsed: elapsed,
-            onReset: onResetTimer,
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Row(
+            SizedBox(height: 16),
+            _RecoveryTimerSection(
+              elapsed: elapsed,
+              onReset: onResetTimer,
+              onTimerTap: onCounterTap,
+            ),
+            SizedBox(height: 16),
+
+            Row(
               children: [
                 _NavButton(icon: Icons.menu_book_rounded, label: 'Journal'),
                 SizedBox(width: 12),
@@ -368,9 +399,11 @@ class _MainCard extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-          _CurrentBenefitsRow(),
-        ],
+            SizedBox(height: 16),
+
+            _CurrentBenefitsRow(),
+          ],
+        ),
       ),
     ).animate().fadeIn(duration: 400.ms).slideY(
           begin: 0.03,
@@ -483,17 +516,17 @@ class _RecoveryTimerSection extends StatelessWidget {
   const _RecoveryTimerSection({
     required this.elapsed,
     required this.onReset,
+    this.onTimerTap,
   });
 
   final Duration elapsed;
   final VoidCallback onReset;
+  final VoidCallback? onTimerTap;
 
-  static const _tabularFigures = [FontFeature.tabularFigures()];
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.15),
@@ -501,27 +534,31 @@ class _RecoveryTimerSection extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.schedule_rounded,
-            color: _kOnPrimaryMuted,
-            size: 20,
-          ),
-          const SizedBox(width: 10),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Recovery Timer',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: _kOnPrimaryMuted,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onTimerTap,
+                borderRadius: BorderRadius.circular(_kCardRadiusSmall),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Recovery Timer',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: _kOnPrimaryMuted,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      _RecoveryTimerDisplay(elapsed: elapsed),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 4),
-                _RecoveryTimerDisplay(elapsed: elapsed),
-              ],
+              ),
             ),
           ),
           Material(
@@ -577,9 +614,12 @@ class _RecoveryTimerDisplay extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
       children: [
+        const Icon(
+          Icons.schedule_rounded,
+          color: _kOnPrimaryMuted,
+          size: 20,
+        ),SizedBox(width: 10),
         SizedBox(
-          width: _kDaysAreaWidth,
-          height: _kDaysAreaHeight,
           child: Align(
             alignment: Alignment.centerLeft,
             child: _FlipOnlyOnChange(
@@ -592,13 +632,10 @@ class _RecoveryTimerDisplay extends StatelessWidget {
         Text('d', style: labelStyle),
         Text(':', style: labelStyle),
         _FlipDigitPair(keyPrefix: 'th', value: h, textStyle: style),
-        Text('h', style: labelStyle),
         Text(':', style: labelStyle),
         _FlipDigitPair(keyPrefix: 'tm', value: m, textStyle: style),
-        Text('m', style: labelStyle),
         Text(':', style: labelStyle),
         _FlipDigitPair(keyPrefix: 'ts', value: s, textStyle: style),
-        Text('s', style: labelStyle),
       ],
     );
   }
@@ -608,7 +645,7 @@ class _FlipOnlyOnChange extends StatelessWidget {
   const _FlipOnlyOnChange({
     required this.value,
     required this.textStyle,
-    this.duration = const Duration(milliseconds: 280),
+    this.duration = const Duration(milliseconds: 700),
   });
 
   final int value;
@@ -748,48 +785,45 @@ class _CurrentBenefitsRow extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {},
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-          child: Row(
-            children: [
-              Icon(
-                Icons.self_improvement_rounded,
-                color: _kOnPrimaryMuted,
-                size: 24,
+        child: Row(
+          children: [
+            Icon(
+              Icons.self_improvement_rounded,
+              color: _kOnPrimaryMuted,
+              size: 24,
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Current Benefits',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: _kOnPrimary,
               ),
-              const SizedBox(width: 12),
-              const Text(
-                'Current Benefits',
+            ),
+            const SizedBox(width: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: _kBenefitsGreen,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Text(
+                '21',
                 style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: _kOnPrimary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
                 ),
               ),
-              const SizedBox(width: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: _kBenefitsGreen,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  '21',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              const Spacer(),
-              Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 14,
-                color: _kOnPrimaryMuted,
-              ),
-            ],
-          ),
+            ),
+            const Spacer(),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 14,
+              color: _kOnPrimaryMuted,
+            ),
+          ],
         ),
       ),
     );
