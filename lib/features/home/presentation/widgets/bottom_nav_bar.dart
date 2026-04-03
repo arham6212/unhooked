@@ -1,27 +1,22 @@
 import 'package:flutter/material.dart';
+
+import '../models/bottom_tab.dart';
 import 'home_constants.dart';
-import 'home_widgets.dart';
 
 class BottomNavBar extends StatelessWidget {
-  const BottomNavBar({super.key, 
-    required this.selectedIndex,
+  const BottomNavBar({
+    super.key,
+    required this.selectedTab,
     required this.onTap,
   });
 
-  final int selectedIndex;
-  final ValueChanged<int> onTap;
+  final BottomTab selectedTab;
+  final ValueChanged<BottomTab> onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final items = [
-      (Icons.home_rounded, 'Home'),
-      (Icons.menu_book_rounded, 'Journal'),
-      (Icons.people_rounded, 'Community'),
-      (Icons.history_rounded, 'History'),
-      (Icons.settings_rounded, 'Settings'),
-    ];
 
     return Container(
       padding: EdgeInsets.only(
@@ -42,44 +37,42 @@ class BottomNavBar extends StatelessWidget {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(
-          items.length,
-          (i) {
-            final (icon, label) = items[i];
-            final selected = i == selectedIndex;
-            return InkWell(
-              onTap: () => onTap(i),
-              borderRadius: BorderRadius.circular(12),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      icon,
-                      size: 24,
+        children: BottomTab.values.map((tab) {
+          final selected = tab == selectedTab;
+
+          return InkWell(
+            onTap: () => onTap(tab),
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    tab.icon,
+                    size: 24,
+                    color: selected
+                        ? kPrimaryStart
+                        : (isDark ? Colors.white54 : kQuoteMuted),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    tab.label,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight:
+                      selected ? FontWeight.w600 : FontWeight.w500,
                       color: selected
                           ? kPrimaryStart
                           : (isDark ? Colors.white54 : kQuoteMuted),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight:
-                            selected ? FontWeight.w600 : FontWeight.w500,
-                        color: selected
-                            ? kPrimaryStart
-                            : (isDark ? Colors.white54 : kQuoteMuted),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            );
-          },
-        ),
+            ),
+          );
+        }).toList(), // ✅ IMPORTANT
       ),
     );
   }
