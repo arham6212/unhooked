@@ -9,7 +9,7 @@ class CurrentBenefitsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      child: InkWell(
+      child: GestureDetector(
         onTap: () {},
         child: Row(
           children: [

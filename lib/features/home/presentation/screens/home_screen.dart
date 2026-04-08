@@ -12,7 +12,7 @@ class NavigationShell extends StatelessWidget {
   void _onTabSelected(int index) {
     shell.goBranch(
       index,
-      initialLocation: index == shell.currentIndex,
+      initialLocation: true,
     );
   }
 

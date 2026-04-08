@@ -72,7 +72,7 @@ class BottomNavBar extends StatelessWidget {
               ),
             ),
           );
-        }).toList(), // ✅ IMPORTANT
+        }).toList(),
       ),
     );
   }

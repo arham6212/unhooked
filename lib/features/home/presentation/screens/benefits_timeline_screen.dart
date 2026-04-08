@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Recovery benefit milestone: at [days], user gets [title] and [description].
 class RecoveryBenefit {
@@ -91,15 +92,10 @@ const List<RecoveryBenefit> _kBenefits = [
   ),
 ];
 
-// Theme
-const _kSurfaceLight = Color(0xFFF8FAFC);
-const _kPrimaryStart = Color(0xFF2563EB);
-const _kPrimaryEnd = Color(0xFF1D4ED8);
-const _kOnPrimary = Color(0xFFFFFFFF);
-const _kOnPrimaryMuted = Color(0xFFE0E7FF);
-const _kAchieved = Color(0xFF059669);
-const _kUpcomingMuted = Color(0xFF64748B);
-const _kLineColor = Color(0xFFE2E8F0);
+// Theme (Using centralized kColor constants)
+const _kAchieved = kColorSuccess;
+const _kUpcomingMuted = kColorTextMutedAlt;
+const _kLineColor = kColorDivider;
 const _kLineColorDark = Color(0xFF334155);
 
 /// Approximate heights for scroll-based parallax (History of Everything).
@@ -159,7 +155,7 @@ class _BenefitsTimelineScreenState extends State<BenefitsTimelineScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final surface = isDark ? const Color(0xFF0F172A) : _kSurfaceLight;
+    final surface = isDark ? const Color(0xFF0F172A) : kColorBgLight;
     final viewportHeight = MediaQuery.sizeOf(context).height -
         (MediaQuery.paddingOf(context).top + kToolbarHeight) -
         MediaQuery.paddingOf(context).bottom;
@@ -361,14 +357,11 @@ class _TimelineNode extends StatelessWidget {
       ),
     );
 
-    // Event icon next to content (HoE: asset/illustration beside event)
-
     final content = Padding(
       padding: const EdgeInsets.only(bottom: 28),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // eventIcon,
           const SizedBox(width: 14),
           Expanded(
             child: Column(
