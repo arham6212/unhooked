@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
@@ -10,7 +11,7 @@ class HistoryScreen extends StatelessWidget {
       body: const Center(
         child: Text(
           'History Screen',
-          style: TextStyle(fontSize: 18),
+          style: AppTypography.heading3,
         ),
       ),
     );

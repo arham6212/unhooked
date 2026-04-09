@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
+import '../../../../core/design_system/components/app_button.dart';
 
 class ErrorView extends StatelessWidget {
   const ErrorView({
@@ -15,38 +18,30 @@ class ErrorView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppSpacing.xxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.wifi_off_rounded, size: 48, color: kColorTextMuted),
-            const SizedBox(height: 16),
-            const Text(
+            const Icon(Icons.wifi_off_rounded, size: 48, color: AppColors.textMuted),
+            const SizedBox(height: AppSpacing.lg),
+            Text(
               'Failed to load posts',
-              style: TextStyle(
-                fontSize: 16,
+              style: AppTypography.heading3.copyWith(
                 fontWeight: FontWeight.w600,
-                color: kColorTextPrimary,
+                color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 13, color: kColorTextMuted),
+              style: AppTypography.bodyMedium.copyWith(color: AppColors.textMuted),
             ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
+            const SizedBox(height: AppSpacing.xl),
+            AppButton(
+              text: 'Retry',
+              icon: Icons.refresh_rounded,
               onPressed: onRetry,
-              icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: const Text('Retry'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kColorTextPrimary,
-                foregroundColor: kColorOnPrimary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
             ),
           ],
         ),

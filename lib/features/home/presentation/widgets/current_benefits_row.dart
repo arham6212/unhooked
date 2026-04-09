@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'home_constants.dart';
-import 'home_widgets.dart';
-
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
+import '../../../../core/design_system/tokens/app_radius.dart';
 class CurrentBenefitsRow extends StatelessWidget {
   const CurrentBenefitsRow({super.key});
 
@@ -15,31 +16,27 @@ class CurrentBenefitsRow extends StatelessWidget {
           children: [
             Icon(
               Icons.self_improvement_rounded,
-              color: kOnPrimaryMuted,
+              color: AppColors.onPrimary.withValues(alpha: 0.7),
               size: 24,
             ),
-            const SizedBox(width: 12),
-            const Text(
+            const SizedBox(width: AppSpacing.md),
+            Text(
               'Current Benefits',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: kOnPrimary,
+              style: AppTypography.button.copyWith(
+                color: AppColors.onPrimary,
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppSpacing.md),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
               decoration: BoxDecoration(
-                color: kBenefitsGreen,
-                borderRadius: BorderRadius.circular(12),
+                color: AppColors.success,
+                borderRadius: AppRadius.medium,
               ),
-              child: const Text(
+              child: Text(
                 '21',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                style: AppTypography.button.copyWith(
+                  color: AppColors.onPrimary,
                 ),
               ),
             ),
@@ -47,7 +44,7 @@ class CurrentBenefitsRow extends StatelessWidget {
             Icon(
               Icons.arrow_forward_ios_rounded,
               size: 14,
-              color: kOnPrimaryMuted,
+              color: AppColors.onPrimary.withValues(alpha: 0.7),
             ),
           ],
         ),

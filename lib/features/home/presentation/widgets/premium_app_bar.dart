@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'home_constants.dart';
-import 'home_widgets.dart';
-
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
+import '../../../../core/design_system/tokens/app_radius.dart';
 class PremiumAppBar extends StatelessWidget {
   const PremiumAppBar({super.key, 
     required this.onMenu,
@@ -19,14 +20,14 @@ class PremiumAppBar extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.md),
       child: Row(
         children: [
           IconButton(
             onPressed: onMenu,
             icon: Icon(
               Icons.menu_rounded,
-              color: isDark ? Colors.white70 : Colors.black87,
+              color: isDark ? AppColors.textMuted : AppColors.textPrimary,
             ),
           ),
           Expanded(
@@ -37,15 +38,14 @@ class PremiumAppBar extends StatelessWidget {
                   'Recover Me',
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: AppSpacing.sm),
                 Container(
-                  width: 8,
-                  height: 8,
+                  width: AppSpacing.sm,
+                  height: AppSpacing.sm,
                   decoration: const BoxDecoration(
-                    color: kPrimaryStart,
+                    color: AppColors.primaryDark,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -53,24 +53,23 @@ class PremiumAppBar extends StatelessWidget {
             ),
           ),
           Material(
-            color: kSosRed,
-            borderRadius: BorderRadius.circular(20),
+            color: AppColors.error,
+            borderRadius: AppRadius.circular,
             child: InkWell(
               onTap: onSos,
-              borderRadius: BorderRadius.circular(20),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              borderRadius: AppRadius.circular,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.add_rounded, color: kOnPrimary, size: 18),
-                    SizedBox(width: 4),
+                    const Icon(Icons.add_rounded, color: AppColors.onPrimary, size: 18),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(
                       'SOS',
-                      style: TextStyle(
-                        color: kOnPrimary,
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.onPrimary,
                         fontWeight: FontWeight.w700,
-                        fontSize: 13,
                       ),
                     ),
                   ],
@@ -81,7 +80,7 @@ class PremiumAppBar extends StatelessWidget {
           PopupMenuButton<String>(
             icon: Icon(
               Icons.more_vert_rounded,
-              color: isDark ? Colors.white70 : Colors.black87,
+              color: isDark ? AppColors.textMuted : AppColors.textPrimary,
             ),
             onSelected: (value) {
               if (value == 'logout') onLogout();

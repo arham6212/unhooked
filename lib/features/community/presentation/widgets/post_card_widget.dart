@@ -1,40 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
 import '../../domain/entities/post.dart';
 import 'avatar_widget.dart';
 
-// ═══════════════════════════════════════════════════════════════
-//  Exact YouTube Comments Style
-//  Adapted for NoFap Community (Minimal, Flat, Compact)
-// ═══════════════════════════════════════════════════════════════
-
-// ── Tokens (Based on YouTube Web & Mobile spacing) ─────────────
-const double _kAvatarSz  = 32.0;   // Strict 32px
-const double _kAvatarGap = 12.0;   // Space between avatar and content
-const double _kPadH      = 16.0;   // Side margins
-const double _kPadV      = 12.0;   // Top/bottom margins per item
-
-// Typography — Strict YouTube Comment Scale
-const double _kNameSz    = 13.0;   // Bold
-const double _kMetaSz    = 12.0;   // Regular, muted
-const double _kTitleSz   = 14.0;   // Bold body
-const double _kBodySz    = 14.0;   // Regular body
-const double _kTagSz     = 11.0;
-const double _kActionSz  = 12.0;
-
-// Colors — Strict YouTube Neutrals
-const Color _cName       = Color(0xFF0F0F0F);   // Solid dark
-const Color _cMeta       = Color(0xFF606060);   // YT Gray
-const Color _cBody       = Color(0xFF0F0F0F);   // Text color
-const Color _cReadMore   = Color(0xFF606060);   // YT Read more is gray
-const Color _cActionIcon = Color(0xFF0F0F0F);   // Default icon
-const Color _cActionText = Color(0xFF606060);   // Action counts
-const Color _cHairline   = Color(0x1F000000);   // 12% black divider
-
-// Active accent colors
-const Color _cLikeActive = Color(0xFF0F0F0F);   // Filled black
+const double kAvatarSz  = 32.0;
 
 // ── Tag catalogue ───────────────────────────────────────────────
 class _Tag {
@@ -44,12 +17,12 @@ class _Tag {
 }
 
 const _kTags = <_Tag>[
-  _Tag('Motivation', Color(0xFF6366F1)),
-  _Tag('Struggling', Color(0xFFE11D48)),
-  _Tag('Winning',    Color(0xFF16A34A)),
-  _Tag('Relapse',    Color(0xFFD97706)),
-  _Tag('Question',   Color(0xFF0284C7)),
-  _Tag('Milestone',  Color(0xFF9333EA)),
+  _Tag('Motivation', AppColors.primary),
+  _Tag('Struggling', AppColors.error),
+  _Tag('Winning',    AppColors.success),
+  _Tag('Relapse',    AppColors.error),
+  _Tag('Question',   AppColors.primary),
+  _Tag('Milestone',  AppColors.primaryLight),
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -121,16 +94,15 @@ class _ActionIconState extends State<_ActionIcon>
                 widget.isActive ? widget.activeIcon : widget.icon,
                 key: ValueKey(widget.isActive),
                 size: 16,
-                color: widget.isActive ? _cLikeActive : _cActionIcon,
+                color: widget.isActive ? AppColors.primary : AppColors.textPrimary,
               ),
               if (widget.label != null) ...[
-                const SizedBox(width: 6),
+                const SizedBox(width: AppSpacing.xs),
                 Text(
                   widget.label!,
-                  style: const TextStyle(
-                    fontSize: _kActionSz,
+                  style: AppTypography.caption.copyWith(
                     fontWeight: FontWeight.w500,
-                    color: _cActionText,
+                    color: AppColors.textMuted,
                     height: 1.0,
                   ),
                 ),
@@ -138,10 +110,9 @@ class _ActionIconState extends State<_ActionIcon>
                 const SizedBox(width: 4),
                 Text(
                   '${widget.count}',
-                  style: const TextStyle(
-                    fontSize: _kActionSz,
+                  style: AppTypography.caption.copyWith(
                     fontWeight: FontWeight.w400,
-                    color: _cActionText,
+                    color: AppColors.textMuted,
                     height: 1.0,
                   ),
                 ),
@@ -167,7 +138,7 @@ class _PostMenu extends StatelessWidget {
       color: Colors.white,
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      icon: const Icon(Icons.more_vert_rounded, size: 16, color: _cActionIcon),
+      icon: const Icon(Icons.more_vert_rounded, size: 16, color: AppColors.textPrimary),
       onSelected: (_) {},
       itemBuilder: (_) => [
         _item(Icons.flag_outlined,           'Report'),
@@ -181,9 +152,9 @@ class _PostMenu extends StatelessWidget {
     value: txt,
     height: 40,
     child: Row(children: [
-      Icon(ic, size: 18, color: _cActionIcon),
-      const SizedBox(width: 12),
-      Text(txt, style: const TextStyle(fontSize: 14, color: _cBody)),
+      Icon(ic, size: 18, color: AppColors.textPrimary),
+      const SizedBox(width: AppSpacing.md),
+      Text(txt, style: AppTypography.bodyMedium),
     ]),
   );
 }
@@ -206,8 +177,8 @@ class _PostCardState extends State<PostCard> {
 
   static const int _truncAt = 220;
 
-  Color get _avatarColor => kColorAvatarPalette[
-      widget.post.userId.hashCode.abs() % kColorAvatarPalette.length];
+  Color get _avatarColor => AppColors.avatarPalette[
+      widget.post.userId.hashCode.abs() % AppColors.avatarPalette.length];
 
   String get _initial =>
       widget.post.userId.isEmpty ? '?' : widget.post.userId[0].toUpperCase();
@@ -247,11 +218,11 @@ class _PostCardState extends State<PostCard> {
       splashColor: Colors.black.withValues(alpha: 0.05),
       highlightColor: Colors.black.withValues(alpha: 0.05),
       child: Container(
-        color: Colors.white,
+        color: AppColors.surface,
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(_kPadH, _kPadV, _kPadH, _kPadV),
+              padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.md),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -260,10 +231,10 @@ class _PostCardState extends State<PostCard> {
                   Avatar(
                     initial: _initial,
                     color: _avatarColor,
-                    size: _kAvatarSz,
+                    size: kAvatarSz,
                   ),
 
-                  const SizedBox(width: _kAvatarGap),
+                  const SizedBox(width: AppSpacing.md),
 
                   // 2. Content (Right Column)
                   Expanded(
@@ -280,21 +251,19 @@ class _PostCardState extends State<PostCard> {
                                 child: Text.rich(
                                   TextSpan(
                                     children: [
-                                      const TextSpan(
+                                      TextSpan(
                                         text: '@anonymous   ',
-                                        style: TextStyle(
-                                          fontSize: _kNameSz,
+                                        style: AppTypography.caption.copyWith(
                                           fontWeight: FontWeight.w600,
-                                          color: _cName,
+                                          color: AppColors.textPrimary,
                                         ),
                                       ),
                                       // Extremely subtle streak & time
                                       TextSpan(
                                         text: '🔥 Day $_streak   •   $_ago',
-                                        style: const TextStyle(
-                                          fontSize: _kMetaSz,
+                                        style: AppTypography.caption.copyWith(
                                           fontWeight: FontWeight.w400,
-                                          color: _cMeta,
+                                          color: AppColors.textMuted,
                                         ),
                                       ),
                                     ],
@@ -320,10 +289,9 @@ class _PostCardState extends State<PostCard> {
                         if (title != null) ...[
                           Text(
                             title,
-                            style: const TextStyle(
-                              fontSize: _kTitleSz,
+                            style: AppTypography.bodyMedium.copyWith(
                               fontWeight: FontWeight.w600,
-                              color: _cBody,
+                              color: AppColors.textPrimary,
                               height: 1.4,
                             ),
                           ),
@@ -332,10 +300,9 @@ class _PostCardState extends State<PostCard> {
 
                         Text(
                           body,
-                          style: const TextStyle(
-                            fontSize: _kBodySz,
+                          style: AppTypography.bodyMedium.copyWith(
                             fontWeight: FontWeight.w400,
-                            color: _cBody,
+                            color: AppColors.textPrimary,
                             height: 1.4,
                           ),
                         ),
@@ -347,10 +314,9 @@ class _PostCardState extends State<PostCard> {
                             onTap: () => setState(() => _expanded = !_expanded),
                             child: Text(
                               _expanded ? 'Show less' : 'Read more',
-                              style: const TextStyle(
-                                fontSize: 13,
+                              style: AppTypography.caption.copyWith(
                                 fontWeight: FontWeight.w500,
-                                color: _cReadMore,
+                                color: AppColors.textMuted,
                               ),
                             ),
                           ),
@@ -370,13 +336,12 @@ class _PostCardState extends State<PostCard> {
                                   shape: BoxShape.circle,
                                 ),
                               ),
-                              const SizedBox(width: 6),
+                              const SizedBox(width: AppSpacing.xs),
                               Text(
                                 tag.label,
-                                style: const TextStyle(
-                                  fontSize: _kTagSz,
+                                style: AppTypography.caption.copyWith(
                                   fontWeight: FontWeight.w400,
-                                  color: _cMeta,
+                                  color: AppColors.textMuted,
                                 ),
                               ),
                             ],
@@ -422,13 +387,12 @@ class _PostCardState extends State<PostCard> {
               ),
             ),
 
-            // Bottom Hairline Divider (Indented to match YouTube layout)
-            const Divider(
+            Divider(
               height: 1,
               thickness: 0.5,
-              color: _cHairline,
-              indent: _kAvatarSz + _kAvatarGap + _kPadH, // Lines up exactly with content
-              endIndent: _kPadH,
+              color: AppColors.textMuted.withValues(alpha: 0.12),
+              indent: kAvatarSz + AppSpacing.md + AppSpacing.lg, // Lines up exactly with content
+              endIndent: AppSpacing.lg,
             ),
           ],
         ),

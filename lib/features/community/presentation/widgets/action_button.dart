@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_radius.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
 
 class ActionBtn extends StatelessWidget {
   const ActionBtn({
@@ -18,19 +21,18 @@ class ActionBtn extends StatelessWidget {
     return Expanded(
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppRadius.small,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 18, color: kColorTextMuted),
-              const SizedBox(width: 5),
+              Icon(icon, size: 18, color: AppColors.textMuted),
+              const SizedBox(width: AppSpacing.xs),
               Text(
                 label,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: kColorTextMuted,
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textMuted,
                   fontWeight: FontWeight.w500,
                 ),
               ),

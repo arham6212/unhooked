@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
 import 'home_widgets.dart';
 
 class RecoveryTimerDisplay extends StatelessWidget {
@@ -14,17 +17,12 @@ class RecoveryTimerDisplay extends StatelessWidget {
     final h = elapsed.inHours % 24;
     final m = elapsed.inMinutes % 60;
     final s = elapsed.inSeconds % 60;
-    final style = TextStyle(
-      fontSize: 22,
-      fontWeight: FontWeight.w700,
-      color: kOnPrimary,
-      height: 1.0,
+    final style = AppTypography.heading2.copyWith(
+      color: AppColors.onPrimary,
       fontFeatures: _tabularFigures,
     );
-    final labelStyle = const TextStyle(
-      fontSize: 22,
-      fontWeight: FontWeight.w600,
-      color: kOnPrimaryMuted,
+    final labelStyle = AppTypography.heading2.copyWith(
+      color: AppColors.onPrimary.withValues(alpha: 0.7),
     );
 
     return Row(
@@ -32,11 +30,12 @@ class RecoveryTimerDisplay extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
       children: [
-        const Icon(
+        Icon(
           Icons.schedule_rounded,
-          color: kOnPrimaryMuted,
+          color: AppColors.onPrimary.withValues(alpha: 0.7),
           size: 20,
-        ),SizedBox(width: 10),
+        ),
+        const SizedBox(width: AppSpacing.md),
         SizedBox(
           child: Align(
             alignment: Alignment.centerLeft,

@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
 import '../../domain/entities/post.dart';
 import '../widgets/post_card_widget.dart';
 
 class PostList extends StatelessWidget {
-  const PostList({
-    super.key,
-    required this.posts,
-    required this.onRefresh,
-  });
+  const PostList({super.key, required this.posts, required this.onRefresh});
 
   final List<Post> posts;
   final Future<void> Function() onRefresh;
@@ -18,20 +16,22 @@ class PostList extends StatelessWidget {
     if (posts.isEmpty) {
       return RefreshIndicator(
         onRefresh: onRefresh,
-        color: const Color(0xFF6366F1),
+        color: AppColors.primary,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 20, 16, 120),
-          children: const [
-            SizedBox(height: 60),
-            _EmptyState(),
-          ],
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.xl,
+            AppSpacing.lg,
+            120,
+          ),
+          children: const [SizedBox(height: 60), _EmptyState()],
         ),
       );
     }
 
     return RefreshIndicator(
       onRefresh: onRefresh,
-      color: const Color(0xFF6366F1),
+      color: AppColors.primary,
       displacement: 60,
       child: ListView.builder(
         // Flat items own their internal padding — list stays edge-to-edge
@@ -59,36 +59,37 @@ class _EmptyState extends StatelessWidget {
           width: 100,
           height: 100,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFFEEF2FF), Color(0xFFF5F3FF)],
+            gradient: LinearGradient(
+              colors: [
+                AppColors.primary.withValues(alpha: 0.1),
+                AppColors.primary.withValues(alpha: 0.05),
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             shape: BoxShape.circle,
           ),
-          child: const Center(
-            child: Text('💬', style: TextStyle(fontSize: 44)),
+          child: Center(
+            child: Text(
+              '💬',
+              style: AppTypography.heading1.copyWith(fontSize: 44),
+            ),
           ),
         ),
-        const SizedBox(height: 24),
-        const Text(
+        const SizedBox(height: AppSpacing.xl),
+        Text(
           'Be the first to share something 💬',
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 18,
+          style: AppTypography.heading3.copyWith(
             fontWeight: FontWeight.w700,
-            color: kColorTextPrimary,
+            color: AppColors.textPrimary,
           ),
         ),
-        const SizedBox(height: 10),
-        const Text(
+        const SizedBox(height: AppSpacing.md),
+        Text(
           'Your community is here for you.\nShare a milestone, ask a question,\nor just say how you\'re doing.',
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 14,
-            color: kColorTextMuted,
-            height: 1.5,
-          ),
+          style: AppTypography.bodyMedium.copyWith(color: AppColors.textMuted),
         ),
       ],
     );

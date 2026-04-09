@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../widgets/greeting_section.dart';
-import '../widgets/home_constants.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../widgets/main_card.dart';
 import '../widgets/premium_app_bar.dart';
 import '../widgets/quote_card.dart';
@@ -56,13 +56,13 @@ class _HomeScreenBodyState extends ConsumerState<HomeScreenBody> {
           ),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: kPagePadding),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppSpacing.xl),
                   const GreetingSection(),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppSpacing.xl),
                   MainCard(
                     elapsed: _elapsed,
                     currentStreak: _elapsed.inDays,
@@ -84,9 +84,9 @@ class _HomeScreenBodyState extends ConsumerState<HomeScreenBody> {
                       );
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.lg),
                   const QuoteCard(),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacing.xl),
                 ],
               ),
             ),

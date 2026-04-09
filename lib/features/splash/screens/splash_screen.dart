@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -54,8 +56,8 @@ class _SplashScreenState extends State<SplashScreen>
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color(0xFF6C4DF6),
-                    Color(0xFF8E6BFF),
+                    AppColors.primaryDark,
+                    AppColors.primaryLight,
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -73,15 +75,14 @@ class _SplashScreenState extends State<SplashScreen>
                 children: [
                   ShaderMask(
                     shaderCallback: (bounds) => const LinearGradient(
-                      colors: [Colors.white, Colors.deepPurple],
+                      colors: [AppColors.onPrimary, AppColors.primaryDark],
                     ).createShader(bounds),
-                    child: const Text(
+                    child: Text(
                       "Inner Monk",
-                      style: TextStyle(
+                      style: AppTypography.heading1.copyWith(
                         fontFamily: 'Baloo',
+                        color: AppColors.onPrimary,
                         fontSize: 38,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
                       ),
                     ),
                   ),

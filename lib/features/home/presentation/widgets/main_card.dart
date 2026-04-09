@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
+import '../../../../core/design_system/tokens/app_radius.dart';
 import 'home_widgets.dart';
-
 class MainCard extends StatelessWidget {
   const MainCard({super.key, 
     required this.elapsed,
@@ -23,15 +26,15 @@ class MainCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(kCardRadius),
+        borderRadius: AppRadius.extraLarge,
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [kPrimaryStart, kPrimaryEnd],
+          colors: [AppColors.primaryDark, AppColors.primaryLight],
         ),
         boxShadow: [
           BoxShadow(
-            color: kPrimaryStart.withValues(alpha: 0.35),
+            color: AppColors.primaryDark.withValues(alpha: 0.35),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -39,7 +42,7 @@ class MainCard extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -55,27 +58,25 @@ class MainCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Column(
-                            crossAxisAlignment: .start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 '$currentStreak',
-                                style: const TextStyle(
+                                style: AppTypography.heading1.copyWith(
                                   fontSize: 42,
-                                  fontWeight: FontWeight.w800,
-                                  color: kOnPrimary,
+                                  color: AppColors.onPrimary,
                                   height: 1.0,
                                   letterSpacing: -1,
                                 ),
                               ),
                               Row(
                                 children: [
-                                  SizedBox(width: 12),
-                                  const Text(
+                                  SizedBox(width: AppSpacing.md),
+                                  Text(
                                     'days',
-                                    style: TextStyle(
-                                      fontSize: 14,
+                                    style: AppTypography.caption.copyWith(
                                       fontWeight: FontWeight.w600,
-                                      color: kOnPrimaryMuted,
+                                      color: AppColors.onPrimary.withValues(alpha: 0.7),
                                     ),
                                   ),
                                 ],
@@ -83,26 +84,23 @@ class MainCard extends StatelessWidget {
                             ],
                           ),
 
-                          const SizedBox(height: 8),
-                          const Text(
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
                             'Current Streak',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: kOnPrimaryMuted,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.onPrimary.withValues(alpha: 0.7),
                             ),
                           ),
                           Text(
                             'Best: $bestStreak days',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: kOnPrimaryMuted,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.onPrimary.withValues(alpha: 0.7),
                             ),
                           ),
                           Text(
                             'Average: $averageStreak days',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: kOnPrimaryMuted,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.onPrimary.withValues(alpha: 0.7),
                             ),
                           ),
                         ],
@@ -114,30 +112,30 @@ class MainCard extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 16),
+            SizedBox(height: AppSpacing.lg),
             RecoveryTimerSection(
               elapsed: elapsed,
               onReset: onResetTimer,
               onTimerTap: onCounterTap,
             ),
-            SizedBox(height: 16),
+            SizedBox(height: AppSpacing.lg),
 
             Row(
               children: [
                 NavButton(icon: Icons.menu_book_rounded, label: 'Journal'),
-                SizedBox(width: 12),
+                SizedBox(width: AppSpacing.md),
                 NavButton(
                   icon: Icons.people_rounded,
                   label: 'Community',
                 ),
-                SizedBox(width: 12),
+                SizedBox(width: AppSpacing.md),
                 NavButton(
                   icon: Icons.school_rounded,
                   label: 'Courses',
                 ),
               ],
             ),
-            SizedBox(height: 16),
+            SizedBox(height: AppSpacing.lg),
 
             CurrentBenefitsRow(),
           ],

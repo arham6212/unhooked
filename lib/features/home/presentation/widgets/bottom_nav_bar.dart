@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../models/bottom_tab.dart';
-import 'home_constants.dart';
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
+import '../../../../core/design_system/tokens/app_radius.dart';
 
 class BottomNavBar extends StatelessWidget {
   const BottomNavBar({
@@ -20,13 +23,13 @@ class BottomNavBar extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 8,
-        bottom: MediaQuery.paddingOf(context).bottom + 8,
+        left: AppSpacing.lg,
+        right: AppSpacing.lg,
+        top: AppSpacing.sm,
+        bottom: MediaQuery.paddingOf(context).bottom + AppSpacing.sm,
       ),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.06),
@@ -42,10 +45,10 @@ class BottomNavBar extends StatelessWidget {
 
           return InkWell(
             onTap: () => onTap(tab),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppRadius.medium,
             child: Padding(
               padding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -53,19 +56,19 @@ class BottomNavBar extends StatelessWidget {
                     tab.icon,
                     size: 24,
                     color: selected
-                        ? kPrimaryStart
-                        : (isDark ? Colors.white54 : kQuoteMuted),
+                        ? AppColors.primary
+                        : (isDark ? AppColors.textMuted : AppColors.textMutedAlt),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     tab.label,
-                    style: TextStyle(
+                    style: AppTypography.caption.copyWith(
                       fontSize: 11,
                       fontWeight:
                       selected ? FontWeight.w600 : FontWeight.w500,
                       color: selected
-                          ? kPrimaryStart
-                          : (isDark ? Colors.white54 : kQuoteMuted),
+                          ? AppColors.primary
+                          : (isDark ? AppColors.textMuted : AppColors.textMutedAlt),
                     ),
                   ),
                 ],

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'home_constants.dart';
-import 'home_widgets.dart';
-
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
 class GreetingSection extends StatelessWidget {
   const GreetingSection({super.key});
 
@@ -21,16 +20,15 @@ class GreetingSection extends StatelessWidget {
       children: [
         Text(
           '$greeting.',
-          style: theme.textTheme.headlineSmall?.copyWith(
+          style: theme.textTheme.displayMedium?.copyWith(
             fontWeight: FontWeight.w700,
-            color: isDark ? Colors.white : Colors.black87,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         Text(
           'Your recovery journey continues',
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: isDark ? Colors.white60 : kQuoteMuted,
+            color: isDark ? AppColors.textMuted : AppColors.textMutedAlt,
           ),
         ),
       ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
 
 /// Recovery benefit milestone: at [days], user gets [title] and [description].
 class RecoveryBenefit {
@@ -92,11 +93,11 @@ const List<RecoveryBenefit> _kBenefits = [
   ),
 ];
 
-// Theme (Using centralized kColor constants)
-const _kAchieved = kColorSuccess;
-const _kUpcomingMuted = kColorTextMutedAlt;
-const _kLineColor = kColorDivider;
-const _kLineColorDark = Color(0xFF334155);
+// Theme (Using centralized AppTokens)
+const _kAchieved = AppColors.success;
+const _kUpcomingMuted = AppColors.textMuted;
+const _kLineColor = AppColors.surfaceDark;
+const _kLineColorDark = AppColors.surfaceDark;
 
 /// Approximate heights for scroll-based parallax (History of Everything).
 const _kIntroHeight = 72.0;
@@ -155,7 +156,7 @@ class _BenefitsTimelineScreenState extends State<BenefitsTimelineScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final surface = isDark ? const Color(0xFF0F172A) : kColorBgLight;
+    final surface = isDark ? AppColors.surfaceDark : AppColors.surface;
     final viewportHeight = MediaQuery.sizeOf(context).height -
         (MediaQuery.paddingOf(context).top + kToolbarHeight) -
         MediaQuery.paddingOf(context).bottom;
@@ -327,7 +328,7 @@ class _TimelineNode extends StatelessWidget {
         shape: BoxShape.circle,
         color: nodeColor,
         border: Border.all(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          color: isDark ? AppColors.surfaceDark : Colors.white,
           width: 3,
         ),
         boxShadow: [
@@ -349,8 +350,7 @@ class _TimelineNode extends StatelessWidget {
     // Time tick in left gutter (HoE: ticks on the left)
     final timeTick = Text(
       benefit.timeLabel.toUpperCase(),
-      style: TextStyle(
-        fontSize: 12,
+      style: AppTypography.caption.copyWith(
         fontWeight: FontWeight.w800,
         letterSpacing: 0.8,
         color: achieved ? _kAchieved : _kUpcomingMuted,
@@ -370,8 +370,7 @@ class _TimelineNode extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   benefit.title,
-                  style: TextStyle(
-                    fontSize: 19,
+                  style: AppTypography.heading3.copyWith(
                     fontWeight: FontWeight.w800,
                     color: titleColor,
                     height: 1.2,
@@ -381,8 +380,7 @@ class _TimelineNode extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   benefit.description,
-                  style: TextStyle(
-                    fontSize: 14,
+                  style: AppTypography.bodyMedium.copyWith(
                     height: 1.45,
                     color: descColor,
                   ),

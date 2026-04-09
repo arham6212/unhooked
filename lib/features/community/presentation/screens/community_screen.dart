@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:go_router/go_router.dart';
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
+import '../../../../core/design_system/tokens/app_radius.dart';
+import '../../../../core/design_system/components/app_text_field.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../providers/posts_provider.dart';
 import '../widgets/error_view.dart';
-import '../widgets/new_post_sheet.dart';
 import '../widgets/post_list_widget.dart';
 
-// ─────────────────────────────────────────────────────────────
-//  Feed filter options
-// ─────────────────────────────────────────────────────────────
+
 enum _FeedFilter { latest, trending, following }
 
 extension _FeedFilterLabel on _FeedFilter {
@@ -40,16 +42,9 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     final asyncPosts = ref.watch(postsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F2EF),
+      backgroundColor: AppColors.background,
       body: Container(
-        // Subtle warm gradient background
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFF7F5F2), Color(0xFFEFEDEA)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+        color: AppColors.background,
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,12 +78,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   }
 
   void _showNewPostSheet(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const NewPostSheet(),
-    );
+    context.push('/community/create');
   }
 
   void _showSearchSheet(BuildContext context) {
@@ -101,9 +91,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-//  Header section
-// ─────────────────────────────────────────────────────────────
+
 class _CommunityHeader extends StatelessWidget {
   const _CommunityHeader({
     required this.activeFilter,
@@ -129,23 +117,20 @@ class _CommunityHeader extends StatelessWidget {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       'Community',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w800,
-                        color: kColorTextPrimary,
+                      style: AppTypography.heading1.copyWith(
+                        color: AppColors.textPrimary,
                         height: 1.1,
                         letterSpacing: -0.5,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(
                       'Connect, share & grow together',
-                      style: TextStyle(
-                        fontSize: 13.5,
-                        color: kColorTextMuted,
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.textMuted,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -163,7 +148,7 @@ class _CommunityHeader extends StatelessWidget {
 
         const SizedBox(height: 14),
 
-        // ── Filter tabs ────────────────────────────────────────
+
         SizedBox(
           height: 36,
           child: ListView(
@@ -186,9 +171,6 @@ class _CommunityHeader extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-//  Filter chip
-// ─────────────────────────────────────────────────────────────
 class _FilterChip extends StatelessWidget {
   const _FilterChip({
     required this.label,
@@ -210,10 +192,10 @@ class _FilterChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isActive ? const Color(0xFF1A1A1A) : Colors.white,
-          borderRadius: BorderRadius.circular(30),
+          color: isActive ? AppColors.textPrimary : AppColors.surface,
+          borderRadius: BorderRadius.circular(AppRadius.pill),
           border: Border.all(
-            color: isActive ? Colors.transparent : const Color(0xFFE2E8F0),
+            color: isActive ? Colors.transparent : AppColors.textMuted.withValues(alpha: 0.2),
           ),
           boxShadow: isActive
               ? [
@@ -227,10 +209,9 @@ class _FilterChip extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: TextStyle(
-            fontSize: 13,
+          style: AppTypography.caption.copyWith(
             fontWeight: FontWeight.w600,
-            color: isActive ? Colors.white : const Color(0xFF64748B),
+            color: isActive ? AppColors.surface : AppColors.textMuted,
           ),
         ),
       ),
@@ -238,9 +219,7 @@ class _FilterChip extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-//  Header icon button
-// ─────────────────────────────────────────────────────────────
+
 class _IconBtn extends StatelessWidget {
   const _IconBtn({required this.icon, required this.onTap});
   final IconData icon;
@@ -270,9 +249,7 @@ class _IconBtn extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-//  Gradient FAB
-// ─────────────────────────────────────────────────────────────
+
 class _GradientFab extends StatefulWidget {
   const _GradientFab({required this.onPressed});
   final VoidCallback onPressed;
@@ -300,15 +277,11 @@ class _GradientFabState extends State<_GradientFab> {
           height: 52,
           padding: const EdgeInsets.symmetric(horizontal: 22),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(30),
+            color: AppColors.primary,
+            borderRadius: BorderRadius.circular(AppRadius.pill),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF6366F1).withValues(alpha: 0.40),
+                color: AppColors.primary.withValues(alpha: 0.40),
                 blurRadius: 16,
                 offset: const Offset(0, 6),
               ),
@@ -316,15 +289,13 @@ class _GradientFabState extends State<_GradientFab> {
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            children: const [
-              Icon(Icons.add_rounded, color: Colors.white, size: 20),
-              SizedBox(width: 8),
+            children: [
+              const Icon(Icons.add_rounded, color: AppColors.onPrimary, size: 20),
+              const SizedBox(width: AppSpacing.sm),
               Text(
                 'Create Post',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 15,
+                style: AppTypography.button.copyWith(
+                  color: AppColors.onPrimary,
                   letterSpacing: 0.2,
                 ),
               ),
@@ -419,16 +390,14 @@ class _Shimmer extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9),
+        color: AppColors.backgroundLight,
         borderRadius: BorderRadius.circular(radius),
       ),
     );
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-//  Search bottom sheet
-// ─────────────────────────────────────────────────────────────
+
 class _SearchSheet extends StatelessWidget {
   const _SearchSheet();
 
@@ -452,44 +421,27 @@ class _SearchSheet extends StatelessWidget {
               height: 4,
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: const Color(0xFFE2E8F0),
+                color: AppColors.surfaceDark,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
           ),
-          const Text(
+          Text(
             'Search Community',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: kColorTextPrimary,
+            style: AppTypography.heading3.copyWith(
+              color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: 14),
-          TextField(
+          const SizedBox(height: AppSpacing.md),
+          const AppTextField(
             autofocus: true,
-            decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.search_rounded,
-                  color: Color(0xFF94A3B8)),
-              hintText: 'Search posts, topics…',
-              hintStyle: const TextStyle(
-                  color: Color(0xFFCBD5E1), fontSize: 14),
-              filled: true,
-              fillColor: const Color(0xFFF8FAFC),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide.none,
-              ),
-            ),
+            hintText: 'Search posts, topics…',
+            prefixIcon: Icon(Icons.search_rounded),
           ),
           const SizedBox(height: 16),
           const Text(
             'Popular Tags',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: kColorTextMuted,
-            ),
+            style: AppTypography.caption,
           ),
           const SizedBox(height: 10),
           Wrap(
@@ -515,16 +467,12 @@ class _SearchTag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9),
+        color: AppColors.backgroundLight,
         borderRadius: BorderRadius.circular(30),
       ),
       child: Text(
         label,
-        style: const TextStyle(
-          fontSize: 13,
-          color: Color(0xFF475569),
-          fontWeight: FontWeight.w500,
-        ),
+        style: AppTypography.caption,
       ),
     );
   }

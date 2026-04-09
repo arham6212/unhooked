@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'home_widgets.dart';
 
+const kClockPairWidth = 36.0;
+const kClockDigitWidth = 18.0;
+const kClockDigitHeight = 32.0;
+
 class FlipDigitPair extends StatelessWidget {
   const FlipDigitPair({super.key, 
     required this.keyPrefix,

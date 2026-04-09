@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
 
 /// Gradient-backed circular avatar with an initial letter.
 class Avatar extends StatelessWidget {
@@ -43,8 +44,8 @@ class Avatar extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         initial,
-        style: TextStyle(
-          color: kColorOnPrimary,
+        style: AppTypography.heading3.copyWith(
+          color: AppColors.onPrimary,
           fontSize: size * 0.42,
           fontWeight: FontWeight.w700,
           letterSpacing: 0.5,

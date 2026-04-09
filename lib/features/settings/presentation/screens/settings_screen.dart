@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
+
 import '../../../auth/presentation/providers/auth_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -13,7 +17,7 @@ class SettingsScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: [
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
 
           // 🔹 Profile
           ListTile(
@@ -58,10 +62,10 @@ class SettingsScreen extends ConsumerWidget {
 
           // 🔥 Logout (IMPORTANT)
           ListTile(
-            leading: const Icon(Icons.logout, color: Colors.red),
-            title: const Text(
+            leading: const Icon(Icons.logout, color: AppColors.error),
+            title: Text(
               'Logout',
-              style: TextStyle(color: Colors.red),
+              style: AppTypography.bodyLarge.copyWith(color: AppColors.error),
             ),
             onTap: () {
               ref.read(authProvider.notifier).logout();

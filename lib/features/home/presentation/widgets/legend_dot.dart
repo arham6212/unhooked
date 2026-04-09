@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'home_constants.dart';
-import 'home_widgets.dart';
-
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
+import '../../../../core/design_system/tokens/app_radius.dart';
 class LegendDot extends StatelessWidget {
   const LegendDot({super.key, required this.color, required this.label});
 
@@ -18,15 +19,14 @@ class LegendDot extends StatelessWidget {
           height: 10,
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(2),
+            borderRadius: AppRadius.small,
           ),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppSpacing.xs),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 10,
-            color: kOnPrimaryMuted,
+          style: AppTypography.caption.copyWith(
+            color: AppColors.onPrimary.withValues(alpha: 0.7),
           ),
         ),
       ],

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/post.dart';
 import '../widgets/post_card_widget.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
 
 class PostDetailsPage extends StatefulWidget {
   final String postId;
@@ -58,23 +60,22 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surface,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Replies',
-          style: TextStyle(
-            fontSize: 16, 
-            color: Color(0xFF0F0F0F), 
+          style: AppTypography.heading3.copyWith(
+            color: AppColors.textPrimary, 
             fontWeight: FontWeight.w600
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surface,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFF0F0F0F)),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
           child: Container(
-            color: const Color(0x1F000000), // YouTube hairline border
+            color: AppColors.textMuted.withValues(alpha: 0.12),
             height: 1.0,
           ),
         ),
@@ -90,7 +91,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                 
                 // Replies (Indented directly matching YouTube UI)
                 ..._mockReplies.map((reply) => Padding(
-                      padding: const EdgeInsets.only(left: 32.0),
+                      padding: const EdgeInsets.only(left: AppSpacing.xxl),
                       child: PostCard(post: reply, isDetail: true),
                     )),
               ],
@@ -109,56 +110,55 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
     final paddingBottom = bottomInset > 0 ? 10.0 : MediaQuery.of(context).padding.bottom + 10.0;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0x1F000000), width: 1.0)),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        border: Border(top: BorderSide(color: AppColors.textMuted.withValues(alpha: 0.12), width: 1.0)),
       ),
-      padding: EdgeInsets.fromLTRB(16, 12, 8, paddingBottom),
+      padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.sm, paddingBottom),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Padding(
-            padding: const EdgeInsets.only(bottom: 6),
+            padding: const EdgeInsets.only(bottom: AppSpacing.xs),
             child: CircleAvatar(
               radius: 16,
-              backgroundColor: kColorAvatarPalette[0],
-              child: const Text(
+              backgroundColor: AppColors.primary,
+              child: Text(
                 'Y', 
-                style: TextStyle(color: Colors.white, fontSize: 14)
-              ), // Representing the current user
+                style: AppTypography.bodyMedium.copyWith(color: AppColors.onPrimary),
+              ), 
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
               decoration: BoxDecoration(
-                color: const Color(0xFFF2F2F2), // YouTube gray input background
+                color: AppColors.backgroundLight,
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: const TextField(
+              child: TextField(
                 decoration: InputDecoration(
                   isDense: true,
                   hintText: 'Add a reply...',
-                  hintStyle: TextStyle(
-                    color: Color(0xFF606060), 
-                    fontSize: 13.5
+                  hintStyle: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textMuted,
                   ),
                   border: InputBorder.none,
                 ),
-                style: TextStyle(fontSize: 14, color: Color(0xFF0F0F0F)),
+                style: AppTypography.bodyMedium.copyWith(color: AppColors.textPrimary),
                 maxLines: 4,
                 minLines: 1,
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           Padding(
             padding: const EdgeInsets.only(bottom: 4),
             child: IconButton(
               icon: const Icon(
                 Icons.send_rounded, 
-                color: Color(0xFF0F0F0F), // YT defaults to black or inactive grey for send icon
+                color: AppColors.textPrimary,
                 size: 24
               ),
               onPressed: () {},

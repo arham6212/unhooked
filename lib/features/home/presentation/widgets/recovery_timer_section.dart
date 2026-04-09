@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
+import '../../../../core/design_system/tokens/app_radius.dart';
 import 'home_widgets.dart';
 
 class RecoveryTimerSection extends StatelessWidget {
@@ -16,10 +20,10 @@ class RecoveryTimerSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(kCardRadiusSmall),
+        color: AppColors.onPrimary.withValues(alpha: 0.15),
+        borderRadius: AppRadius.large,
       ),
       child: Row(
         children: [
@@ -28,21 +32,20 @@ class RecoveryTimerSection extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 onTap: onTimerTap,
-                borderRadius: BorderRadius.circular(kCardRadiusSmall),
+                borderRadius: AppRadius.large,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Recovery Timer',
-                        style: TextStyle(
-                          fontSize: 12,
+                        style: AppTypography.caption.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: kOnPrimaryMuted,
+                          color: AppColors.onPrimary.withValues(alpha: 0.7),
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
                       RecoveryTimerDisplay(elapsed: elapsed),
                     ],
                   ),
@@ -51,16 +54,16 @@ class RecoveryTimerSection extends StatelessWidget {
             ),
           ),
           Material(
-            color: Colors.white.withValues(alpha: 0.2),
+            color: AppColors.onPrimary.withValues(alpha: 0.2),
             shape: const CircleBorder(),
             child: InkWell(
               onTap: onReset,
               customBorder: const CircleBorder(),
               child: const Padding(
-                padding: EdgeInsets.all(12),
+                padding: EdgeInsets.all(AppSpacing.md),
                 child: Icon(
                   Icons.refresh_rounded,
-                  color: kOnPrimary,
+                  color: AppColors.onPrimary,
                   size: 22,
                 ),
               ),

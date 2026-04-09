@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
-
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
+import '../../../../core/design_system/tokens/app_radius.dart';
+import '../../../../core/design_system/components/app_button.dart';
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -69,7 +73,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final authState = ref.watch(authProvider);
     final isBusy = authState.isLoading;
 
@@ -82,15 +85,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              colorScheme.surface,
-              colorScheme.primaryContainer.withValues(alpha: 0.05),
-              colorScheme.surface,
+              AppColors.backgroundLight,
+              AppColors.primary.withValues(alpha: 0.05),
+              AppColors.backgroundLight,
             ],
           ),
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.xl),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -106,13 +109,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                         return Transform.scale(
                           scale: _pulseAnimation.value,
                           child: Container(
-                            padding: const EdgeInsets.all(28),
+                            padding: const EdgeInsets.all(AppSpacing.xl),
                             decoration: BoxDecoration(
-                              color: colorScheme.primary,
+                              color: AppColors.primary,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: colorScheme.primary.withValues(alpha: 0.2),
+                                  color: AppColors.primary.withValues(alpha: 0.2),
                                   blurRadius: 30,
                                   spreadRadius: 10,
                                 ),
@@ -121,7 +124,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                             child: const Icon(
                               Icons.auto_awesome,
                               size: 72,
-                              color: Colors.white,
+                              color: AppColors.onPrimary,
                             ),
                           ),
                         );
@@ -129,7 +132,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                     ),
                   ),
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: AppSpacing.xl),
                 // Title and Subtitle with stagger
                 SlideTransition(
                   position: _slideAnimation,
@@ -139,20 +142,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                       children: [
                         Text(
                           'Recover Me',
-                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.2,
-                                color: colorScheme.onSurface,
-                              ),
+                          style: AppTypography.heading1,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                         Text(
                           'Your companion on the road to recovery.\nSimple. Secure. Supportive.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: colorScheme.onSurfaceVariant,
-                            height: 1.5,
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.textMutedAlt,
                           ),
                         ),
                       ],
@@ -164,69 +161,41 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                   FadeTransition(
                     opacity: _fadeAnimation,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
                       decoration: BoxDecoration(
-                        color: colorScheme.errorContainer,
-                        borderRadius: BorderRadius.circular(8),
+                        color: AppColors.error.withValues(alpha: 0.1),
+                        borderRadius: AppRadius.small,
                       ),
                       child: Text(
                         authState.error!,
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: colorScheme.onErrorContainer),
+                        style: AppTypography.bodyMedium.copyWith(color: AppColors.error),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacing.xl),
                 ],
                 // Button with slide/fade
                 SlideTransition(
                   position: _slideAnimation,
                   child: FadeTransition(
                     opacity: _fadeAnimation,
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 60,
-                      child: FilledButton.icon(
-                        style: FilledButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          elevation: 0,
-                        ),
-                        onPressed: isBusy
-                            ? null
-                            : () => ref.read(authProvider.notifier).signInWithGoogle(),
-                        icon: isBusy
-                            ? const SizedBox(
-                                height: 24,
-                                width: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : Image.network(
-                                'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1200px-Google_%22G%22_logo.svg.png',
-                                height: 24,
-                              ),
-                        label: Text(
-                          isBusy ? 'Signing in...' : 'Continue with Google',
-                          style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
+                    child: AppButton(
+                      text: 'Continue with Google',
+                      isLoading: isBusy,
+                      fullWidth: true,
+                      icon: isBusy ? null : Icons.login, // Google icon missing from generic icons, fall back to login icon or no icon.
+                      onPressed: () => ref.read(authProvider.notifier).signInWithGoogle(),
                     ),
                   ),
                 ),
                 const SizedBox(height: 32),
                 FadeTransition(
                   opacity: _fadeAnimation,
-                  child: const Text(
+                  child: Text(
                     'By continuing, you agree to our Terms and Privacy Policy.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                    style: AppTypography.caption,
                   ),
                 ),
               ],

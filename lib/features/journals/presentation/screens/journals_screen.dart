@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
 
 class JournalScreen extends StatelessWidget {
   const JournalScreen({super.key});
@@ -10,7 +11,7 @@ class JournalScreen extends StatelessWidget {
       body: const Center(
         child: Text(
           'Journal Screen',
-          style: TextStyle(fontSize: 18),
+          style: AppTypography.heading3,
         ),
       ),
     );

@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/config/app_config.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
 import 'features/home/presentation/navigation/app_router.dart';
+import 'core/design_system/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,14 +33,9 @@ class MyApp extends ConsumerWidget {
 
       routerConfig: ref.watch(routerProvider), // ✅ CONNECT GO ROUTER
 
-      theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: const Color(0xFF0B5FFF),
-        textTheme: const TextTheme(
-          headlineMedium: TextStyle(fontWeight: FontWeight.w700),
-          titleMedium: TextStyle(fontWeight: FontWeight.w600),
-        ),
-      ),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
     );
   }
 }

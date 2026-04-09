@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
+import '../../../../core/design_system/tokens/app_radius.dart';
 import 'home_widgets.dart';
-
 class DailyGrid extends StatelessWidget {
   const DailyGrid({super.key});
 
@@ -13,15 +16,14 @@ class DailyGrid extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        const Text(
+        Text(
           '$total Days',
-          style: TextStyle(
-            fontSize: 12,
+          style: AppTypography.caption.copyWith(
             fontWeight: FontWeight.w600,
-            color: kOnPrimaryMuted,
+            color: AppColors.onPrimary.withValues(alpha: 0.7),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         SizedBox(
           width: 96,
           child: GridView.builder(
@@ -29,8 +31,8 @@ class DailyGrid extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: cols,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
+              mainAxisSpacing: AppSpacing.xs,
+              crossAxisSpacing: AppSpacing.xs,
               childAspectRatio: 1,
             ),
             itemCount: total,
@@ -38,8 +40,8 @@ class DailyGrid extends StatelessWidget {
               final isRelapsed = relapsedIndices.contains(index);
               return Container(
                 decoration: BoxDecoration(
-                  color: isRelapsed ? kRelapsedDay : kCleanDay,
-                  borderRadius: BorderRadius.circular(4),
+                  color: isRelapsed ? AppColors.error : AppColors.onPrimary,
+                  borderRadius: AppRadius.small,
                   boxShadow: [
                     if (!isRelapsed)
                       BoxShadow(
@@ -52,13 +54,13 @@ class DailyGrid extends StatelessWidget {
             },
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: AppSpacing.sm),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            LegendDot(color: kCleanDay, label: 'Clean'),
-            const SizedBox(width: 8),
-            LegendDot(color: kRelapsedDay, label: 'Relapsed'),
+            const LegendDot(color: AppColors.onPrimary, label: 'Clean'),
+            const SizedBox(width: AppSpacing.sm),
+            const LegendDot(color: AppColors.error, label: 'Relapsed'),
           ],
         ),
       ],

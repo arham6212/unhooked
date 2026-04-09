@@ -9,6 +9,7 @@ import '../../../auth/presentation/screens/onboarding_screen.dart';
 
 import '../../../community/presentation/screens/community_screen.dart';
 import '../../../community/presentation/screens/post_details_page.dart';
+import '../../../community/presentation/screens/create_post_screen.dart';
 import '../../../community/domain/entities/post.dart';
 import '../../../journals/presentation/screens/journals_screen.dart';
 import '../../../relapse_history/presentation/screens/relapse_history_screen.dart';
@@ -25,7 +26,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   final authNotifier = ValueNotifier<int>(0);
 
   // 🔄 Refresh router when auth changes
-  ref.listen<AuthState>(authProvider, (_, __) {
+  ref.listen<AuthState>(authProvider, (_, state) {
     authNotifier.value++;
   });
 
@@ -130,6 +131,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: '/community',
                 builder: (context, state) => const CommunityScreen(),
                 routes: [
+                  GoRoute(
+                    path: 'create',
+                    builder: (context, state) => const CreatePostScreen(),
+                  ),
                   GoRoute(
                     path: 'post/:id',
                     builder: (context, state) {
