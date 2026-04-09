@@ -9,7 +9,7 @@ import '../../../auth/presentation/screens/onboarding_screen.dart';
 
 import '../../../community/presentation/screens/community_screen.dart';
 import '../../../community/presentation/screens/post_details_page.dart';
-
+import '../../../community/domain/entities/post.dart';
 import '../../../journals/presentation/screens/journals_screen.dart';
 import '../../../relapse_history/presentation/screens/relapse_history_screen.dart';
 import '../../../settings/presentation/screens/settings_screen.dart';
@@ -134,7 +134,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: 'post/:id',
                     builder: (context, state) {
                       final id = state.pathParameters['id']!;
-                      return PostDetailsPage();
+                      final post = state.extra as Post?;
+                      return PostDetailsPage(postId: id, post: post);
                     },
                   ),
                 ],
