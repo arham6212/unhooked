@@ -5,10 +5,11 @@ import '../../../../core/design_system/tokens/app_typography.dart';
 import '../../../../core/design_system/tokens/app_radius.dart';
 
 class NavButton extends StatelessWidget {
-  const NavButton({super.key, required this.icon, required this.label});
+  const NavButton({super.key, required this.icon, required this.label, this.onTap});
 
   final IconData icon;
   final String label;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,7 @@ class NavButton extends StatelessWidget {
         color: AppColors.onPrimary.withValues(alpha: 0.12),
         borderRadius: AppRadius.medium,
         child: InkWell(
-          onTap: () {},
+          onTap: onTap,
           borderRadius: AppRadius.medium,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),

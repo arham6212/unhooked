@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../models/bottom_tab.dart';
 import '../../../../core/design_system/tokens/app_colors.dart';
@@ -23,8 +24,8 @@ class BottomNavBar extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.only(
-        left: AppSpacing.lg,
-        right: AppSpacing.lg,
+        left: AppSpacing.sm,
+        right: AppSpacing.sm,
         top: AppSpacing.sm,
         bottom: MediaQuery.paddingOf(context).bottom + AppSpacing.sm,
       ),
@@ -42,40 +43,88 @@ class BottomNavBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: BottomTab.values.map((tab) {
           final selected = tab == selectedTab;
-
-          return InkWell(
-            onTap: () => onTap(tab),
-            borderRadius: AppRadius.medium,
-            child: Padding(
-              padding:
-              const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    tab.icon,
-                    size: 24,
-                    color: selected
-                        ? AppColors.primary
-                        : (isDark ? AppColors.textMuted : AppColors.textMutedAlt),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    tab.label,
-                    style: AppTypography.caption.copyWith(
-                      fontSize: 11,
-                      fontWeight:
-                      selected ? FontWeight.w600 : FontWeight.w500,
-                      color: selected
-                          ? AppColors.primary
-                          : (isDark ? AppColors.textMuted : AppColors.textMutedAlt),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          return _NavItem(
+            tab: tab,
+            selected: selected,
+            isDark: isDark,
+            onTap: () {
+              HapticFeedback.selectionClick();
+              onTap(tab);
+            },
           );
         }).toList(),
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.tab,
+    required this.selected,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  final BottomTab tab;
+  final bool selected;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+        decoration: BoxDecoration(
+          color: selected
+              ? AppColors.primary.withValues(alpha: 0.1)
+              : Colors.transparent,
+          borderRadius: AppRadius.medium,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedScale(
+              scale: selected ? 1.1 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutBack,
+              child: Icon(
+                tab.icon,
+                size: 22,
+                color: selected
+                    ? AppColors.primary
+                    : (isDark ? AppColors.textMuted : AppColors.textMutedAlt),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              tab.label,
+              style: AppTypography.caption.copyWith(
+                fontSize: 11,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                color: selected
+                    ? AppColors.primary
+                    : (isDark ? AppColors.textMuted : AppColors.textMutedAlt),
+              ),
+            ),
+            const SizedBox(height: 3),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              width: selected ? 16 : 0,
+              height: 3,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: AppRadius.circular,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

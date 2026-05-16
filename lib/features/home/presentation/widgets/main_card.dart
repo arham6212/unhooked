@@ -7,13 +7,16 @@ import '../../../../core/design_system/tokens/app_radius.dart';
 import 'home_widgets.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 class MainCard extends StatelessWidget {
-  const MainCard({super.key, 
+  const MainCard({super.key,
     required this.elapsed,
     required this.currentStreak,
     required this.bestStreak,
     required this.averageStreak,
     required this.onResetTimer,
     this.onCounterTap,
+    this.onJournalTap,
+    this.onCommunityTap,
+    this.onCoursesTap,
   });
 
   final Duration elapsed;
@@ -22,6 +25,9 @@ class MainCard extends StatelessWidget {
   final int averageStreak;
   final VoidCallback onResetTimer;
   final VoidCallback? onCounterTap;
+  final VoidCallback? onJournalTap;
+  final VoidCallback? onCommunityTap;
+  final VoidCallback? onCoursesTap;
 
   @override
   Widget build(BuildContext context) {
@@ -123,17 +129,11 @@ class MainCard extends StatelessWidget {
 
             Row(
               children: [
-                NavButton(icon: LucideIcons.bookOpen, label: 'Journal'),
+                NavButton(icon: LucideIcons.bookOpen, label: 'Journal', onTap: onJournalTap),
                 SizedBox(width: AppSpacing.md),
-                NavButton(
-                  icon: LucideIcons.users,
-                  label: 'Community',
-                ),
+                NavButton(icon: LucideIcons.users, label: 'Community', onTap: onCommunityTap),
                 SizedBox(width: AppSpacing.md),
-                NavButton(
-                  icon: LucideIcons.graduationCap,
-                  label: 'Courses',
-                ),
+                NavButton(icon: LucideIcons.graduationCap, label: 'Courses', onTap: onCoursesTap),
               ],
             ),
             SizedBox(height: AppSpacing.lg),
