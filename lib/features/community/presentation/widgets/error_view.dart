@@ -3,6 +3,7 @@ import '../../../../core/design_system/tokens/app_colors.dart';
 import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
 import '../../../../core/design_system/components/app_button.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class ErrorView extends StatelessWidget {
   const ErrorView({
@@ -22,7 +23,7 @@ class ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.wifi_off_rounded, size: 48, color: AppColors.textMuted),
+            const Icon(LucideIcons.wifiOff, size: 48, color: AppColors.textMuted),
             const SizedBox(height: AppSpacing.lg),
             Text(
               'Failed to load posts',
@@ -40,7 +41,7 @@ class ErrorView extends StatelessWidget {
             const SizedBox(height: AppSpacing.xl),
             AppButton(
               text: 'Retry',
-              icon: Icons.refresh_rounded,
+              icon: LucideIcons.refreshCw,
               onPressed: onRetry,
             ),
           ],

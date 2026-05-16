@@ -6,6 +6,7 @@ import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
 import '../../domain/entities/post.dart';
 import 'avatar_widget.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 const double kAvatarSz  = 32.0;
 
@@ -138,12 +139,12 @@ class _PostMenu extends StatelessWidget {
       color: Colors.white,
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      icon: const Icon(Icons.more_vert_rounded, size: 16, color: AppColors.textPrimary),
+      icon: const Icon(LucideIcons.moreVertical, size: 16, color: AppColors.textPrimary),
       onSelected: (_) {},
       itemBuilder: (_) => [
-        _item(Icons.flag_outlined,           'Report'),
-        _item(Icons.visibility_off_outlined, 'Hide'),
-        _item(Icons.link_rounded,            'Copy link'),
+        _item(LucideIcons.flag,           'Report'),
+        _item(LucideIcons.eyeOff, 'Hide'),
+        _item(LucideIcons.link,            'Copy link'),
       ],
     );
   }
@@ -354,8 +355,8 @@ class _PostCardState extends State<PostCard> {
                         Row(
                           children: [
                             _ActionIcon(
-                              icon: Icons.thumb_up_alt_outlined,
-                              activeIcon: Icons.thumb_up_alt,
+                              icon: LucideIcons.thumbsUp,
+                              activeIcon: LucideIcons.thumbsUp,
                               count: _likes,
                               isActive: _liked,
                               onTap: () => setState(() => _liked = !_liked),
@@ -363,8 +364,8 @@ class _PostCardState extends State<PostCard> {
                             const SizedBox(width: 16),
 
                             _ActionIcon(
-                              icon: Icons.chat_bubble_outline,
-                              activeIcon: Icons.chat_bubble,
+                              icon: LucideIcons.messageCircle,
+                              activeIcon: LucideIcons.messageCircle,
                               count: widget.post.commentsCount,
                               isActive: false,
                               onTap: widget.isDetail ? () {} : () => context.push('/community/post/${widget.post.id}', extra: widget.post),
@@ -372,8 +373,8 @@ class _PostCardState extends State<PostCard> {
                             const SizedBox(width: 16),
 
                             _ActionIcon(
-                              icon: Icons.ios_share_outlined,
-                              activeIcon: Icons.ios_share,
+                              icon: LucideIcons.share2,
+                              activeIcon: LucideIcons.share2,
                               label: null,
                               isActive: false,
                               onTap: () {},

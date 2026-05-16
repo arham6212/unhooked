@@ -3,6 +3,7 @@ import '../../../../core/design_system/tokens/app_colors.dart';
 import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
 import '../../../../core/design_system/tokens/app_radius.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 class PremiumAppBar extends StatelessWidget {
   const PremiumAppBar({super.key, 
     required this.onMenu,
@@ -26,7 +27,7 @@ class PremiumAppBar extends StatelessWidget {
           IconButton(
             onPressed: onMenu,
             icon: Icon(
-              Icons.menu_rounded,
+              LucideIcons.menu,
               color: isDark ? AppColors.textMuted : AppColors.textPrimary,
             ),
           ),
@@ -63,7 +64,7 @@ class PremiumAppBar extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.add_rounded, color: AppColors.onPrimary, size: 18),
+                    const Icon(LucideIcons.plus, color: AppColors.onPrimary, size: 18),
                     const SizedBox(width: AppSpacing.xs),
                     Text(
                       'SOS',
@@ -79,7 +80,7 @@ class PremiumAppBar extends StatelessWidget {
           ),
           PopupMenuButton<String>(
             icon: Icon(
-              Icons.more_vert_rounded,
+              LucideIcons.moreVertical,
               color: isDark ? AppColors.textMuted : AppColors.textPrimary,
             ),
             onSelected: (value) {
@@ -90,7 +91,7 @@ class PremiumAppBar extends StatelessWidget {
                 value: 'logout',
                 child: Row(
                   children: [
-                    Icon(Icons.logout_rounded, size: 20),
+                    Icon(LucideIcons.logOut, size: 20),
                     SizedBox(width: 12),
                     Text('Log out'),
                   ],

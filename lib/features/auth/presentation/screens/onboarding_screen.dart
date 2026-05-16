@@ -7,6 +7,7 @@ import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
 import '../../../../core/design_system/tokens/app_radius.dart';
 import '../../../../core/design_system/components/app_button.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 class OnboardingScreen extends ConsumerWidget {
   const OnboardingScreen({super.key});
 
@@ -27,7 +28,7 @@ class OnboardingScreen extends ConsumerWidget {
                   borderRadius: AppRadius.large,
                 ),
                 child: const Icon(
-                  Icons.shield_moon_outlined,
+                  LucideIcons.moon,
                   color: AppColors.onPrimary,
                   size: 28,
                 ),
@@ -44,19 +45,19 @@ class OnboardingScreen extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.xl),
               _FeatureTile(
-                icon: Icons.auto_graph_outlined,
+                icon: LucideIcons.trendingUp,
                 title: 'Track your streaks',
                 subtitle: 'See momentum build day by day.',
               ),
               const SizedBox(height: AppSpacing.lg),
               const _FeatureTile(
-                icon: Icons.notifications_none_outlined,
+                icon: LucideIcons.bell,
                 title: 'Smart reminders',
                 subtitle: 'Support without pressure.',
               ),
               const SizedBox(height: AppSpacing.lg),
               const _FeatureTile(
-                icon: Icons.lock_outline,
+                icon: LucideIcons.lock,
                 title: 'Private by design',
                 subtitle: 'Your data stays yours.',
               ),

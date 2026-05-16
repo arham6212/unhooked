@@ -6,6 +6,7 @@ import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
 import '../../../../core/design_system/tokens/app_radius.dart';
 import '../../../../core/design_system/components/app_button.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -122,7 +123,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                               ],
                             ),
                             child: const Icon(
-                              Icons.auto_awesome,
+                              LucideIcons.sparkles,
                               size: 72,
                               color: AppColors.onPrimary,
                             ),
@@ -184,7 +185,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                       text: 'Continue with Google',
                       isLoading: isBusy,
                       fullWidth: true,
-                      icon: isBusy ? null : Icons.login, // Google icon missing from generic icons, fall back to login icon or no icon.
+                      icon: isBusy ? null : LucideIcons.logIn, // Google icon missing from generic icons, fall back to login icon or no icon.
                       onPressed: () => ref.read(authProvider.notifier).signInWithGoogle(),
                     ),
                   ),

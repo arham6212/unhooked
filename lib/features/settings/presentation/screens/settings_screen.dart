@@ -7,6 +7,7 @@ import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -21,7 +22,7 @@ class SettingsScreen extends ConsumerWidget {
 
           // 🔹 Profile
           ListTile(
-            leading: const Icon(Icons.person_outline),
+            leading: const Icon(LucideIcons.user),
             title: const Text('Profile'),
             onTap: () {
               // future navigation
@@ -30,14 +31,14 @@ class SettingsScreen extends ConsumerWidget {
 
           // 🔹 Notifications
           ListTile(
-            leading: const Icon(Icons.notifications_none),
+            leading: const Icon(LucideIcons.bell),
             title: const Text('Notifications'),
             onTap: () {},
           ),
 
           // 🔹 Privacy
           ListTile(
-            leading: const Icon(Icons.lock_outline),
+            leading: const Icon(LucideIcons.lock),
             title: const Text('Privacy'),
             onTap: () {},
           ),
@@ -46,14 +47,14 @@ class SettingsScreen extends ConsumerWidget {
 
           // 🔹 About
           ListTile(
-            leading: const Icon(Icons.info_outline),
+            leading: const Icon(LucideIcons.info),
             title: const Text('About'),
             onTap: () {},
           ),
 
           // 🔹 Help
           ListTile(
-            leading: const Icon(Icons.help_outline),
+            leading: const Icon(LucideIcons.helpCircle),
             title: const Text('Help & Support'),
             onTap: () {},
           ),
@@ -62,7 +63,7 @@ class SettingsScreen extends ConsumerWidget {
 
           // 🔥 Logout (IMPORTANT)
           ListTile(
-            leading: const Icon(Icons.logout, color: AppColors.error),
+            leading: const Icon(LucideIcons.logOut, color: AppColors.error),
             title: Text(
               'Logout',
               style: AppTypography.bodyLarge.copyWith(color: AppColors.error),

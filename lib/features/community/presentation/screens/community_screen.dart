@@ -10,6 +10,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../providers/posts_provider.dart';
 import '../widgets/error_view.dart';
 import '../widgets/post_list_widget.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 
 enum _FeedFilter { latest, trending, following }
@@ -139,7 +140,7 @@ class _CommunityHeader extends StatelessWidget {
               ),
               // Search icon button
               _IconBtn(
-                icon: Icons.search_rounded,
+                icon: LucideIcons.search,
                 onTap: onSearch,
               ),
             ],
@@ -290,7 +291,7 @@ class _GradientFabState extends State<_GradientFab> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.add_rounded, color: AppColors.onPrimary, size: 20),
+              const Icon(LucideIcons.plus, color: AppColors.onPrimary, size: 20),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 'Create Post',
@@ -436,7 +437,7 @@ class _SearchSheet extends StatelessWidget {
           const AppTextField(
             autofocus: true,
             hintText: 'Search posts, topics…',
-            prefixIcon: Icon(Icons.search_rounded),
+            prefixIcon: Icon(LucideIcons.search),
           ),
           const SizedBox(height: 16),
           const Text(

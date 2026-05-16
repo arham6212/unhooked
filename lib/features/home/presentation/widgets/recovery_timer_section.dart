@@ -4,6 +4,7 @@ import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
 import '../../../../core/design_system/tokens/app_radius.dart';
 import 'home_widgets.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class RecoveryTimerSection extends StatelessWidget {
   const RecoveryTimerSection({super.key, 
@@ -62,7 +63,7 @@ class RecoveryTimerSection extends StatelessWidget {
               child: const Padding(
                 padding: EdgeInsets.all(AppSpacing.md),
                 child: Icon(
-                  Icons.refresh_rounded,
+                  LucideIcons.refreshCw,
                   color: AppColors.onPrimary,
                   size: 22,
                 ),

@@ -3,6 +3,7 @@ import '../../../../core/design_system/tokens/app_colors.dart';
 import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
 import '../../../../core/design_system/tokens/app_radius.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 class CurrentBenefitsRow extends StatelessWidget {
   const CurrentBenefitsRow({super.key});
 
@@ -15,7 +16,7 @@ class CurrentBenefitsRow extends StatelessWidget {
         child: Row(
           children: [
             Icon(
-              Icons.self_improvement_rounded,
+              LucideIcons.heart,
               color: AppColors.onPrimary.withValues(alpha: 0.7),
               size: 24,
             ),
@@ -42,7 +43,7 @@ class CurrentBenefitsRow extends StatelessWidget {
             ),
             const Spacer(),
             Icon(
-              Icons.arrow_forward_ios_rounded,
+              LucideIcons.chevronRight,
               size: 14,
               color: AppColors.onPrimary.withValues(alpha: 0.7),
             ),

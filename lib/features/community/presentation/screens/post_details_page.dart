@@ -4,6 +4,7 @@ import '../widgets/post_card_widget.dart';
 import '../../../../core/design_system/tokens/app_colors.dart';
 import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class PostDetailsPage extends StatefulWidget {
   final String postId;
@@ -157,7 +158,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
             padding: const EdgeInsets.only(bottom: 4),
             child: IconButton(
               icon: const Icon(
-                Icons.send_rounded, 
+                LucideIcons.send, 
                 color: AppColors.textPrimary,
                 size: 24
               ),

@@ -6,6 +6,7 @@ import '../providers/quote_provider.dart';
 import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
 import '../../../../core/design_system/components/app_card.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class QuoteCard extends ConsumerStatefulWidget {
   const QuoteCard({super.key});
@@ -25,7 +26,7 @@ class QuoteCardState extends ConsumerState<QuoteCard> {
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Row(
         children: [
-          const Icon(Icons.format_quote_rounded),
+          const Icon(LucideIcons.quote),
           const SizedBox(width: AppSpacing.md),
 
           Expanded(
@@ -47,7 +48,7 @@ class QuoteCardState extends ConsumerState<QuoteCard> {
                 index++; // ✅ local change only
               });
             },
-            icon: const Icon(Icons.refresh_rounded),
+            icon: const Icon(LucideIcons.refreshCw),
           ),
         ],
       ),

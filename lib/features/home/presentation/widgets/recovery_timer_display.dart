@@ -3,6 +3,7 @@ import '../../../../core/design_system/tokens/app_colors.dart';
 import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
 import 'home_widgets.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class RecoveryTimerDisplay extends StatelessWidget {
   const RecoveryTimerDisplay({super.key, required this.elapsed});
@@ -31,7 +32,7 @@ class RecoveryTimerDisplay extends StatelessWidget {
       textBaseline: TextBaseline.alphabetic,
       children: [
         Icon(
-          Icons.schedule_rounded,
+          LucideIcons.clock,
           color: AppColors.onPrimary.withValues(alpha: 0.7),
           size: 20,
         ),

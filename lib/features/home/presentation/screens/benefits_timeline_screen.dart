@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../core/design_system/tokens/app_colors.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 /// Recovery benefit milestone: at [days], user gets [title] and [description].
 class RecoveryBenefit {
@@ -10,7 +11,7 @@ class RecoveryBenefit {
     required this.timeLabel,
     required this.title,
     required this.description,
-    this.icon = Icons.celebration_rounded,
+    this.icon = LucideIcons.partyPopper,
   });
 
   final int days;
@@ -26,70 +27,70 @@ const List<RecoveryBenefit> _kBenefits = [
     timeLabel: 'Day 0',
     title: 'You started',
     description: 'The moment you chose recovery. Every benefit from here builds on this.',
-    icon: Icons.flag_rounded,
+    icon: LucideIcons.flag,
   ),
   RecoveryBenefit(
     days: 1,
     timeLabel: '24 hours',
     title: 'First day clear',
     description: 'Your body begins to clear the substance. Hydration and rest help.',
-    icon: Icons.wb_sunny_rounded,
+    icon: LucideIcons.sun,
   ),
   RecoveryBenefit(
     days: 3,
     timeLabel: '72 hours',
     title: 'Detox in motion',
     description: 'Acute withdrawal often peaks and starts to ease. Sleep may still be rough.',
-    icon: Icons.health_and_safety_rounded,
+    icon: LucideIcons.shieldCheck,
   ),
   RecoveryBenefit(
     days: 7,
     timeLabel: '1 week',
     title: 'Sleep & mood shift',
     description: 'Many notice better sleep and more stable mood. Cravings can still spike.',
-    icon: Icons.nightlight_round,
+    icon: LucideIcons.moon,
   ),
   RecoveryBenefit(
     days: 14,
     timeLabel: '2 weeks',
     title: 'Energy & focus',
     description: 'Mental clarity and energy often improve. Routine starts to feel possible.',
-    icon: Icons.psychology_rounded,
+    icon: LucideIcons.brain,
   ),
   RecoveryBenefit(
     days: 30,
     timeLabel: '1 month',
     title: 'Stronger foundation',
     description: 'Physical and mental gains become clearer. New habits take root.',
-    icon: Icons.eco_rounded,
+    icon: LucideIcons.leaf,
   ),
   RecoveryBenefit(
     days: 90,
     timeLabel: '90 days',
     title: 'Brain rewiring',
     description: 'Neural pathways shift. Cravings reduce; sober identity feels more natural.',
-    icon: Icons.psychology_alt_rounded,
+    icon: LucideIcons.brainCircuit,
   ),
   RecoveryBenefit(
     days: 180,
     timeLabel: '6 months',
     title: 'New identity',
     description: 'You’re not “quitting”—you’re someone who lives without it.',
-    icon: Icons.person_rounded,
+    icon: LucideIcons.user,
   ),
   RecoveryBenefit(
     days: 365,
     timeLabel: '1 year',
     title: 'Major milestone',
     description: 'A full year of choices. Celebrate and keep building.',
-    icon: Icons.celebration_rounded,
+    icon: LucideIcons.partyPopper,
   ),
   RecoveryBenefit(
     days: 730,
     timeLabel: '2 years',
     title: 'Deep stability',
     description: 'Recovery is part of who you are. Keep your practices and community.',
-    icon: Icons.anchor_rounded,
+    icon: LucideIcons.anchor,
   ),
 ];
 
@@ -168,7 +169,7 @@ class _BenefitsTimelineScreenState extends State<BenefitsTimelineScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
+          icon: const Icon(LucideIcons.arrowLeft),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(

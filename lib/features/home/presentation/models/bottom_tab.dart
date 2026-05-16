@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 enum BottomTab {
-  home(Icons.home_outlined, 'Home'),
-  journal(Icons.menu_book_outlined, 'Journal'),
-  community(Icons.people_outline_outlined, 'Community'),
-  history(Icons.history_outlined, 'History'),
-  settings(Icons.settings_outlined, 'Settings');
+  home(LucideIcons.home, 'Home'),
+  journal(LucideIcons.bookOpen, 'Journal'),
+  community(LucideIcons.users, 'Community'),
+  history(LucideIcons.history, 'History'),
+  settings(LucideIcons.settings, 'Settings');
 
   final IconData icon;
   final String label;
