@@ -21,38 +21,48 @@ class BottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final bottomPad = MediaQuery.paddingOf(context).bottom;
 
-    return Container(
-      padding: EdgeInsets.only(
-        left: AppSpacing.sm,
-        right: AppSpacing.sm,
-        top: AppSpacing.sm,
-        bottom: MediaQuery.paddingOf(context).bottom + AppSpacing.sm,
-      ),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 12,
-            offset: const Offset(0, -4),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: BottomTab.values.map((tab) {
-          final selected = tab == selectedTab;
-          return _NavItem(
-            tab: tab,
-            selected: selected,
-            isDark: isDark,
-            onTap: () {
-              HapticFeedback.selectionClick();
-              onTap(tab);
-            },
-          );
-        }).toList(),
+    // Outer wrapper provides the floating margin + safe-area spacing
+    return Padding(
+      padding: EdgeInsets.fromLTRB(14, 0, 14, (bottomPad > 0 ? bottomPad : 10) + 2),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.sm,
+        ),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          borderRadius: AppRadius.extraLarge,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.10),
+              blurRadius: 28,
+              spreadRadius: -2,
+              offset: const Offset(0, 8),
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: BottomTab.values.map((tab) {
+            final selected = tab == selectedTab;
+            return _NavItem(
+              tab: tab,
+              selected: selected,
+              isDark: isDark,
+              onTap: () {
+                HapticFeedback.selectionClick();
+                onTap(tab);
+              },
+            );
+          }).toList(),
+        ),
       ),
     );
   }
@@ -77,21 +87,21 @@ class _NavItem extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 220),
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
         decoration: BoxDecoration(
           color: selected
               ? AppColors.primary.withValues(alpha: 0.1)
               : Colors.transparent,
-          borderRadius: AppRadius.medium,
+          borderRadius: AppRadius.large,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             AnimatedScale(
-              scale: selected ? 1.1 : 1.0,
-              duration: const Duration(milliseconds: 200),
+              scale: selected ? 1.12 : 1.0,
+              duration: const Duration(milliseconds: 220),
               curve: Curves.easeOutBack,
               child: Icon(
                 tab.icon,
@@ -102,8 +112,8 @@ class _NavItem extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.xs),
-            Text(
-              tab.label,
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 220),
               style: AppTypography.caption.copyWith(
                 fontSize: 11,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
@@ -111,10 +121,11 @@ class _NavItem extends StatelessWidget {
                     ? AppColors.primary
                     : (isDark ? AppColors.textMuted : AppColors.textMutedAlt),
               ),
+              child: Text(tab.label),
             ),
             const SizedBox(height: 3),
             AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
+              duration: const Duration(milliseconds: 220),
               curve: Curves.easeOutCubic,
               width: selected ? 16 : 0,
               height: 3,

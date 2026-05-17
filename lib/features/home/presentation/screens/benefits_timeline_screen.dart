@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../../core/design_system/tokens/app_colors.dart';
-import '../../../../core/design_system/tokens/app_typography.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
+import '../../../../core/design_system/tokens/app_radius.dart';
 
-/// Recovery benefit milestone: at [days], user gets [title] and [description].
 class RecoveryBenefit {
   const RecoveryBenefit({
     required this.days,
@@ -12,6 +13,7 @@ class RecoveryBenefit {
     required this.title,
     required this.description,
     this.icon = LucideIcons.partyPopper,
+    this.color = AppColors.primary,
   });
 
   final int days;
@@ -19,241 +21,153 @@ class RecoveryBenefit {
   final String title;
   final String description;
   final IconData icon;
+  final Color color;
 }
 
 const List<RecoveryBenefit> _kBenefits = [
- RecoveryBenefit(
+  RecoveryBenefit(
     days: 0,
     timeLabel: 'Day 0',
     title: 'You started',
     description: 'The moment you chose recovery. Every benefit from here builds on this.',
     icon: LucideIcons.flag,
+    color: Color(0xFF2563FF),
   ),
   RecoveryBenefit(
     days: 1,
-    timeLabel: '24 hours',
+    timeLabel: '24 Hours',
     title: 'First day clear',
     description: 'Your body begins to clear the substance. Hydration and rest help.',
     icon: LucideIcons.sun,
+    color: Color(0xFFF59E0B),
   ),
   RecoveryBenefit(
     days: 3,
-    timeLabel: '72 hours',
+    timeLabel: '72 Hours',
     title: 'Detox in motion',
     description: 'Acute withdrawal often peaks and starts to ease. Sleep may still be rough.',
     icon: LucideIcons.shieldCheck,
+    color: Color(0xFF10B981),
   ),
   RecoveryBenefit(
     days: 7,
-    timeLabel: '1 week',
+    timeLabel: '1 Week',
     title: 'Sleep & mood shift',
     description: 'Many notice better sleep and more stable mood. Cravings can still spike.',
     icon: LucideIcons.moon,
+    color: Color(0xFF8B5CF6),
   ),
   RecoveryBenefit(
     days: 14,
-    timeLabel: '2 weeks',
+    timeLabel: '2 Weeks',
     title: 'Energy & focus',
-    description: 'Mental clarity and energy often improve. Routine starts to feel possible.',
+    description: 'Mental clarity and energy improve. Routine starts to feel possible.',
     icon: LucideIcons.brain,
+    color: Color(0xFF06B6D4),
   ),
   RecoveryBenefit(
     days: 30,
-    timeLabel: '1 month',
+    timeLabel: '1 Month',
     title: 'Stronger foundation',
     description: 'Physical and mental gains become clearer. New habits take root.',
     icon: LucideIcons.leaf,
+    color: Color(0xFF10B981),
   ),
   RecoveryBenefit(
     days: 90,
-    timeLabel: '90 days',
+    timeLabel: '90 Days',
     title: 'Brain rewiring',
-    description: 'Neural pathways shift. Cravings reduce; sober identity feels more natural.',
+    description: 'Neural pathways shift. Cravings reduce; sober identity feels natural.',
     icon: LucideIcons.brainCircuit,
+    color: Color(0xFF2563FF),
   ),
   RecoveryBenefit(
     days: 180,
-    timeLabel: '6 months',
+    timeLabel: '6 Months',
     title: 'New identity',
-    description: 'You’re not “quitting”—you’re someone who lives without it.',
+    description: 'You\'re not "quitting" — you\'re someone who lives without it.',
     icon: LucideIcons.user,
+    color: Color(0xFFEC4899),
   ),
   RecoveryBenefit(
     days: 365,
-    timeLabel: '1 year',
+    timeLabel: '1 Year',
     title: 'Major milestone',
     description: 'A full year of choices. Celebrate and keep building.',
     icon: LucideIcons.partyPopper,
+    color: Color(0xFFF59E0B),
   ),
   RecoveryBenefit(
     days: 730,
-    timeLabel: '2 years',
+    timeLabel: '2 Years',
     title: 'Deep stability',
     description: 'Recovery is part of who you are. Keep your practices and community.',
     icon: LucideIcons.anchor,
+    color: Color(0xFF2563FF),
   ),
 ];
 
-// Theme (Using centralized AppTokens)
-const _kAchieved = AppColors.success;
-const _kUpcomingMuted = AppColors.textMuted;
-const _kLineColor = AppColors.surfaceDark;
-const _kLineColorDark = AppColors.surfaceDark;
-
-/// Approximate heights for scroll-based parallax (History of Everything).
-const _kIntroHeight = 72.0;
-const _kNodeHeight = 148.0;
-
-/// HoE-style parallax: scale 0.82 when far, 1.0 at center (like asset.scale 0.2–1.0).
-double _parallaxScale(double distance, double viewportHeight) {
-  const double falloff = 320.0;
-  final t = (1.0 - (distance / falloff).clamp(0.0, 1.0));
-  return (0.82 + 0.18 * t).clamp(0.82, 1.0);
-}
-
-/// HoE-style opacity: fade when far from center.
-double _parallaxOpacity(double distance, double viewportHeight) {
-  const double falloff = 340.0;
-  final t = (1.0 - (distance / falloff).clamp(0.0, 1.0));
-  return (0.68 + 0.32 * t).clamp(0.68, 1.0);
-}
-
-/// Full-screen timeline — same effect as History of Everything (2Dimensions):
-/// pinch zoom, scroll-linked scale/opacity, left time ticks, central spine.
-class BenefitsTimelineScreen extends StatefulWidget {
-  const BenefitsTimelineScreen({
-    super.key,
-    required this.currentDays,
-  });
+class BenefitsTimelineScreen extends StatelessWidget {
+  const BenefitsTimelineScreen({super.key, required this.currentDays});
 
   final int currentDays;
 
   @override
-  State<BenefitsTimelineScreen> createState() => _BenefitsTimelineScreenState();
-}
-
-class _BenefitsTimelineScreenState extends State<BenefitsTimelineScreen> {
-  final ScrollController _scrollController = ScrollController();
-  double _scrollOffset = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-  }
-
-  void _onScroll() {
-    setState(() => _scrollOffset = _scrollController.offset);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final surface = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final viewportHeight = MediaQuery.sizeOf(context).height -
-        (MediaQuery.paddingOf(context).top + kToolbarHeight) -
-        MediaQuery.paddingOf(context).bottom;
+    final achievedCount =
+        _kBenefits.where((b) => currentDays >= b.days).length;
+    final progress = achievedCount / _kBenefits.length;
+
+    // Index of the next upcoming milestone
+    final nextIndex = _kBenefits.indexWhere((b) => currentDays < b.days);
 
     return Scaffold(
-      backgroundColor: surface,
-      appBar: AppBar(
-        backgroundColor: surface,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          'Benefits of recovery',
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
-      body: Stack(
-        children: [
-          // Central spine (HoE: single line through time, fixed in viewport)
-          Positioned(
-            left: _kPagePadding + _kGutterWidth + _kSpineNodeSize / 2 -
-                _kSpineStrokeWidth / 2,
-            top: 0,
-            bottom: 0,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return CustomPaint(
-                  size: Size(_kSpineStrokeWidth, constraints.maxHeight),
-                  painter: _SpinePainter(
-                    color: isDark ? _kLineColorDark : _kLineColor,
-                    strokeWidth: _kSpineStrokeWidth,
-                  ),
-                );
-              },
+      backgroundColor: AppColors.background,
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          // ── Hero header ──────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: _HeroHeader(
+              currentDays: currentDays,
+              achievedCount: achievedCount,
+              total: _kBenefits.length,
+              progress: progress,
+              onBack: () => Navigator.of(context).pop(),
             ),
           ),
-          InteractiveViewer(
-            minScale: 0.75,
-            maxScale: 1.6,
-            clipBehavior: Clip.none,
-            child: ListView.builder(
-              controller: _scrollController,
-              physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.only(
-                left: _kPagePadding,
-                right: _kPagePadding,
-                top: 8,
-                bottom: MediaQuery.paddingOf(context).bottom + 24,
-              ),
-              itemCount: _kBenefits.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 28),
-                    child: Text(
-                      'What happens next — a timeline of recovery.',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: isDark ? Colors.white54 : _kUpcomingMuted,
-                        height: 1.4,
-                      ),
-                    ),
-                  )
-                      .animate()
-                      .fadeIn(duration: 400.ms)
-                      .slideY(
-                        begin: 0.02,
-                        end: 0,
-                        duration: 400.ms,
-                        curve: Curves.easeOut,
-                      );
-                }
-                final nodeIndex = index - 1;
-                final benefit = _kBenefits[nodeIndex];
-                final achieved = widget.currentDays >= benefit.days;
-                final layoutOffset =
-                    _kIntroHeight + nodeIndex * _kNodeHeight + _kNodeHeight / 2;
-                final viewportCenter = _scrollOffset + viewportHeight / 2;
-                final distance = (layoutOffset - viewportCenter).abs();
-                final scale = _parallaxScale(distance, viewportHeight);
-                final opacity = _parallaxOpacity(distance, viewportHeight);
 
-                return _TimelineNode(
-                  benefit: benefit,
-                  achieved: achieved,
-                  isDark: isDark,
-                  isLast: nodeIndex == _kBenefits.length - 1,
-                  index: nodeIndex,
-                  scale: scale,
-                  opacity: opacity,
-                );
-              },
+          // ── Timeline ─────────────────────────────────────────────
+          SliverPadding(
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.xl,
+              AppSpacing.lg,
+              AppSpacing.xl,
+              MediaQuery.paddingOf(context).bottom + AppSpacing.xxl,
+            ),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final benefit = _kBenefits[index];
+                  final achieved = currentDays >= benefit.days;
+                  final isCurrent = index == nextIndex - 1 ||
+                      (nextIndex == -1 && index == _kBenefits.length - 1);
+                  final isNext = index == nextIndex;
+                  final isLast = index == _kBenefits.length - 1;
+
+                  return _TimelineRow(
+                    benefit: benefit,
+                    achieved: achieved,
+                    isCurrent: isCurrent,
+                    isNext: isNext,
+                    isFirst: index == 0,
+                    isLast: isLast,
+                    index: index,
+                    currentDays: currentDays,
+                  );
+                },
+                childCount: _kBenefits.length,
+              ),
             ),
           ),
         ],
@@ -262,176 +176,512 @@ class _BenefitsTimelineScreenState extends State<BenefitsTimelineScreen> {
   }
 }
 
-const _kSpineStrokeWidth = 3.0;
-const _kSpineNodeSize = 28.0;
-/// Left gutter for time ticks (HoE: GutterLeft = 45)
-const _kGutterWidth = 52.0;
-
-/// Paints a vertical line (timeline spine) for the full height.
-class _SpinePainter extends CustomPainter {
-  _SpinePainter({required this.color, required this.strokeWidth});
-
-  final Color color;
-  final double strokeWidth;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke;
-    canvas.drawLine(
-      Offset(size.width / 2, 0),
-      Offset(size.width / 2, size.height),
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-const _kPagePadding = 20.0;
-
-class _TimelineNode extends StatelessWidget {
-  const _TimelineNode({
-    required this.benefit,
-    required this.achieved,
-    required this.isDark,
-    required this.isLast,
-    required this.index,
-    this.scale = 1.0,
-    this.opacity = 1.0,
+// ── Hero Header ────────────────────────────────────────────────
+class _HeroHeader extends StatelessWidget {
+  const _HeroHeader({
+    required this.currentDays,
+    required this.achievedCount,
+    required this.total,
+    required this.progress,
+    required this.onBack,
   });
 
-  final RecoveryBenefit benefit;
-  final bool achieved;
-  final bool isDark;
-  final bool isLast;
-  final int index;
-  final double scale;
-  final double opacity;
+  final int currentDays;
+  final int achievedCount;
+  final int total;
+  final double progress;
+  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
-    final nodeColor = achieved
-        ? _kAchieved
-        : (isDark ? _kUpcomingMuted : _kLineColorDark);
-    final titleColor = isDark ? Colors.white : Colors.black87;
-    final descColor = isDark ? Colors.white60 : _kUpcomingMuted;
+    final topPad = MediaQuery.paddingOf(context).top;
 
-    // Bubble on the spine (History of Everything: node with icon on the line)
-    final bubbleIconColor = achieved ? Colors.white : (isDark ? Colors.white38 : _kUpcomingMuted);
-    final bubble = Container(
-      width: _kSpineNodeSize,
-      height: _kSpineNodeSize,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: nodeColor,
-        border: Border.all(
-          color: isDark ? AppColors.surfaceDark : Colors.white,
-          width: 3,
-        ),
-        boxShadow: [
-          if (achieved)
-            BoxShadow(
-              color: _kAchieved.withValues(alpha: 0.45),
-              blurRadius: 10,
-              spreadRadius: 0,
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.primary,
+      ),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+            AppSpacing.lg, topPad + AppSpacing.sm, AppSpacing.xl, AppSpacing.xl),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Back button
+            GestureDetector(
+              onTap: onBack,
+              child: Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: AppColors.onPrimary.withValues(alpha: 0.18),
+                  borderRadius: AppRadius.medium,
+                ),
+                child: const Icon(
+                  LucideIcons.arrowLeft,
+                  color: AppColors.onPrimary,
+                  size: 18,
+                ),
+              ),
             ),
-        ],
-      ),
-      child: Icon(
-        benefit.icon,
-        size: 16,
-        color: bubbleIconColor,
-      ),
-    );
 
-    // Time tick in left gutter (HoE: ticks on the left)
-    final timeTick = Text(
-      benefit.timeLabel.toUpperCase(),
-      style: AppTypography.caption.copyWith(
-        fontWeight: FontWeight.w800,
-        letterSpacing: 0.8,
-        color: achieved ? _kAchieved : _kUpcomingMuted,
-      ),
-    );
+            const SizedBox(height: AppSpacing.lg),
 
-    final content = Padding(
-      padding: const EdgeInsets.only(bottom: 28),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
+            Text(
+              'Recovery Journey',
+              style: AppTypography.heading2.copyWith(
+                color: AppColors.onPrimary,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              'What your body and mind gain over time.',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.onPrimary.withValues(alpha: 0.75),
+              ),
+            ),
+
+            const SizedBox(height: AppSpacing.xl),
+
+            // Stats row
+            Row(
+              children: [
+                _StatChip(
+                  value: '$currentDays',
+                  label: 'Days sober',
+                  icon: LucideIcons.flame,
+                ),
+                const SizedBox(width: AppSpacing.md),
+                _StatChip(
+                  value: '$achievedCount / $total',
+                  label: 'Milestones',
+                  icon: LucideIcons.trophy,
+                ),
+              ],
+            ),
+
+            const SizedBox(height: AppSpacing.lg),
+
+            // Progress bar
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 2),
-                Text(
-                  benefit.title,
-                  style: AppTypography.heading3.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: titleColor,
-                    height: 1.2,
-                    letterSpacing: -0.3,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '$achievedCount milestones reached',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.onPrimary.withValues(alpha: 0.80),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      '${(progress * 100).round()}%',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.onPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  benefit.description,
-                  style: AppTypography.bodyMedium.copyWith(
-                    height: 1.45,
-                    color: descColor,
+                const SizedBox(height: AppSpacing.sm),
+                ClipRRect(
+                  borderRadius: AppRadius.circular,
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 6,
+                    backgroundColor: AppColors.onPrimary.withValues(alpha: 0.20),
+                    valueColor:
+                        const AlwaysStoppedAnimation<Color>(AppColors.onPrimary),
                   ),
                 ),
               ],
             ),
+          ],
+        ),
+      ),
+    ).animate().fadeIn(duration: 400.ms);
+  }
+}
+
+class _StatChip extends StatelessWidget {
+  const _StatChip({
+    required this.value,
+    required this.label,
+    required this.icon,
+  });
+
+  final String value;
+  final String label;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.onPrimary.withValues(alpha: 0.16),
+        borderRadius: AppRadius.large,
+        border: Border.all(
+          color: AppColors.onPrimary.withValues(alpha: 0.20),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: AppColors.onPrimary),
+          const SizedBox(width: AppSpacing.xs),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.onPrimary,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 13,
+                ),
+              ),
+              Text(
+                label,
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.onPrimary.withValues(alpha: 0.70),
+                  fontSize: 10,
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
+  }
+}
 
-    // Row: [left gutter: time tick] [spine: bubble] [content] (HoE layout)
-    final row = Row(
+// ── Timeline Row ───────────────────────────────────────────────
+class _TimelineRow extends StatelessWidget {
+  const _TimelineRow({
+    required this.benefit,
+    required this.achieved,
+    required this.isCurrent,
+    required this.isNext,
+    required this.isFirst,
+    required this.isLast,
+    required this.index,
+    required this.currentDays,
+  });
+
+  final RecoveryBenefit benefit;
+  final bool achieved;
+  final bool isCurrent;
+  final bool isNext;
+  final bool isFirst;
+  final bool isLast;
+  final int index;
+  final int currentDays;
+
+  @override
+  Widget build(BuildContext context) {
+    final nodeColor = achieved
+        ? AppColors.success
+        : isNext
+            ? AppColors.primary
+            : AppColors.border;
+
+    final lineColor = achieved ? AppColors.success : AppColors.border;
+
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // ── Track column ──────────────────────────────────────
         SizedBox(
-          width: _kGutterWidth,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: timeTick,
-          ),
-        ),
-        SizedBox(
-          width: _kSpineNodeSize,
-          child: Center(child: bubble),
-        ),
-        const SizedBox(width: 18),
-        Expanded(child: content),
-      ],
-    );
+          width: 40,
+          child: Column(
+            children: [
+              // Top connector line
+              if (!isFirst)
+                Container(
+                  width: 2,
+                  height: 16,
+                  color: lineColor,
+                ),
 
-    return Opacity(
-      opacity: opacity.clamp(0.0, 1.0),
-      child: Transform.scale(
-        alignment: Alignment.centerLeft,
-        scale: scale,
-        child: row
-          .animate()
-          .fadeIn(
-            duration: 400.ms,
-            delay: (80 * index).ms,
-            curve: Curves.easeOut,
-          )
-          .slideX(
-            begin: 0.06,
-            end: 0,
-            duration: 400.ms,
-            delay: (80 * index).ms,
-            curve: Curves.easeOutCubic,
+              // Node circle
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: achieved
+                      ? AppColors.success
+                      : isNext
+                          ? AppColors.primaryXLight
+                          : AppColors.surface,
+                  border: Border.all(
+                    color: nodeColor,
+                    width: achieved ? 0 : 2,
+                  ),
+                  boxShadow: [
+                    if (achieved)
+                      BoxShadow(
+                        color: AppColors.success.withValues(alpha: 0.30),
+                        blurRadius: 10,
+                        spreadRadius: 0,
+                        offset: const Offset(0, 3),
+                      ),
+                    if (isNext)
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.20),
+                        blurRadius: 10,
+                        spreadRadius: 0,
+                        offset: const Offset(0, 3),
+                      ),
+                  ],
+                ),
+                child: Icon(
+                  achieved ? LucideIcons.check : benefit.icon,
+                  size: 16,
+                  color: achieved
+                      ? Colors.white
+                      : isNext
+                          ? AppColors.primary
+                          : AppColors.textMuted,
+                ),
+              ),
+
+              // Bottom connector line
+              if (!isLast)
+                Container(
+                  width: 2,
+                  height: 24,
+                  color: lineColor,
+                ),
+            ],
           ),
+        ),
+
+        const SizedBox(width: AppSpacing.md),
+
+        // ── Card ──────────────────────────────────────────────
+        Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: isLast ? 0 : AppSpacing.md,
+              top: isFirst ? 0 : 8,
+            ),
+            child: _MilestoneCard(
+              benefit: benefit,
+              achieved: achieved,
+              isCurrent: isCurrent,
+              isNext: isNext,
+            ),
+          ),
+        ),
+      ],
+    )
+        .animate()
+        .fadeIn(duration: 380.ms, delay: (60 * index).ms, curve: Curves.easeOut)
+        .slideX(
+          begin: 0.04,
+          end: 0,
+          duration: 380.ms,
+          delay: (60 * index).ms,
+          curve: Curves.easeOutCubic,
+        );
+  }
+}
+
+class _MilestoneCard extends StatelessWidget {
+  const _MilestoneCard({
+    required this.benefit,
+    required this.achieved,
+    required this.isCurrent,
+    required this.isNext,
+  });
+
+  final RecoveryBenefit benefit;
+  final bool achieved;
+  final bool isCurrent;
+  final bool isNext;
+
+  @override
+  Widget build(BuildContext context) {
+    final cardColor = achieved
+        ? AppColors.surface
+        : isNext
+            ? AppColors.surface
+            : AppColors.surface;
+
+    final borderColor = isCurrent
+        ? AppColors.primary.withValues(alpha: 0.40)
+        : achieved
+            ? AppColors.success.withValues(alpha: 0.20)
+            : AppColors.border;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: AppRadius.large,
+        border: Border.all(color: borderColor, width: 1.5),
+        boxShadow: [
+          if (isCurrent || achieved)
+            BoxShadow(
+              color: (isCurrent ? AppColors.primary : AppColors.success)
+                  .withValues(alpha: 0.07),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+            ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.025),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top row: time chip + icon + optional badge
+            Row(
+              children: [
+                // Time chip
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: achieved
+                        ? AppColors.success.withValues(alpha: 0.10)
+                        : isNext
+                            ? AppColors.primaryXLight
+                            : AppColors.backgroundLight,
+                    borderRadius: AppRadius.circular,
+                  ),
+                  child: Text(
+                    benefit.timeLabel,
+                    style: AppTypography.caption.copyWith(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: achieved
+                          ? AppColors.success
+                          : isNext
+                              ? AppColors.primary
+                              : AppColors.textMuted,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ),
+
+                const Spacer(),
+
+                // "Up next" or "Achieved" badge
+                if (isNext)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: AppRadius.circular,
+                    ),
+                    child: Text(
+                      'Up next',
+                      style: AppTypography.caption.copyWith(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.onPrimary,
+                      ),
+                    ),
+                  ),
+
+                if (isCurrent)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.success.withValues(alpha: 0.12),
+                      borderRadius: AppRadius.circular,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(LucideIcons.check, size: 10, color: AppColors.success),
+                        const SizedBox(width: 3),
+                        Text(
+                          'Current',
+                          style: AppTypography.caption.copyWith(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.success,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                // Benefit icon in colored bg (top right)
+                const SizedBox(width: AppSpacing.sm),
+                Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: benefit.color.withValues(
+                      alpha: achieved ? 0.12 : 0.07,
+                    ),
+                    borderRadius: AppRadius.medium,
+                  ),
+                  child: Icon(
+                    benefit.icon,
+                    size: 15,
+                    color: achieved
+                        ? benefit.color
+                        : benefit.color.withValues(alpha: 0.45),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: AppSpacing.sm),
+
+            // Title
+            Text(
+              benefit.title,
+              style: AppTypography.bodyMedium.copyWith(
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+                color: achieved || isNext
+                    ? AppColors.textPrimary
+                    : AppColors.textMuted,
+                letterSpacing: -0.2,
+              ),
+            ),
+
+            const SizedBox(height: AppSpacing.xs),
+
+            // Description
+            Text(
+              benefit.description,
+              style: AppTypography.caption.copyWith(
+                color: achieved || isNext
+                    ? AppColors.textBody
+                    : AppColors.textMuted,
+                height: 1.5,
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -158,7 +158,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
 
-          // ⚙️ SETTINGS
+          // 👤 PROFILE
           StatefulShellBranch(
             routes: [
               GoRoute(

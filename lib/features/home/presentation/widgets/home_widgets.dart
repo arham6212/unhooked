@@ -11,3 +11,8 @@ export 'nav_button.dart';
 export 'current_benefits_row.dart';
 export 'quote_card.dart';
 export 'bottom_nav_bar.dart';
+export 'motivation_card.dart';
+export 'recovery_timer_card.dart';
+export 'quick_action_grid.dart';
+export 'mini_stat_card.dart';
+export 'todays_focus_card.dart';

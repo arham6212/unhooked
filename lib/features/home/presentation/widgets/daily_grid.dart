@@ -17,7 +17,7 @@ class DailyGrid extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
-          '$total Days',
+          'Last $total Days',
           style: AppTypography.caption.copyWith(
             fontWeight: FontWeight.w600,
             color: AppColors.onPrimary.withValues(alpha: 0.7),

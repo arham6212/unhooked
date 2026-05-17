@@ -21,7 +21,8 @@ class NavigationShell extends StatelessWidget {
     final selectedTab = BottomTab.values[shell.currentIndex];
 
     return Scaffold(
-      body: shell, // ✅ THIS replaces IndexedStack
+      extendBody: true,
+      body: shell,
       bottomNavigationBar: BottomNavBar(
         selectedTab: selectedTab,
         onTap: (tab) {

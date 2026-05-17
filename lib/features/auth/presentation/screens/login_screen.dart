@@ -81,15 +81,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
+          // Subtle 3-point cool-white gradient — clean like Apple Health
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
             colors: [
-              AppColors.backgroundLight,
-              AppColors.primary.withValues(alpha: 0.05),
-              AppColors.backgroundLight,
+              Color(0xFFF0F4FF), // faint blue wash at top
+              Color(0xFFF7F8FC), // neutral mid
+              Color(0xFFFFFFFF), // pure white at bottom
             ],
+            stops: [0.0, 0.5, 1.0],
           ),
         ),
         child: SafeArea(
@@ -112,13 +114,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderSt
                           child: Container(
                             padding: const EdgeInsets.all(AppSpacing.xl),
                             decoration: BoxDecoration(
-                              color: AppColors.primary,
                               shape: BoxShape.circle,
+                              gradient: const LinearGradient(
+                                begin: Alignment(-0.6, -1.0),
+                                end: Alignment(1.0, 1.0),
+                                colors: [
+                                  AppColors.primaryDark,
+                                  AppColors.primary,
+                                  AppColors.primaryLight,
+                                ],
+                                stops: [0.0, 0.5, 1.0],
+                              ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.2),
-                                  blurRadius: 30,
-                                  spreadRadius: 10,
+                                  color: AppColors.primary.withValues(alpha: 0.30),
+                                  blurRadius: 40,
+                                  spreadRadius: 0,
+                                  offset: const Offset(0, 8),
+                                ),
+                                BoxShadow(
+                                  color: AppColors.primaryLight.withValues(alpha: 0.18),
+                                  blurRadius: 60,
+                                  spreadRadius: 8,
+                                  offset: Offset.zero,
                                 ),
                               ],
                             ),

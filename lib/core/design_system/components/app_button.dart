@@ -62,16 +62,18 @@ class AppButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [AppColors.primary, AppColors.primaryLight],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            colors: [AppColors.primaryDark, AppColors.primary, AppColors.primaryLight],
+            stops: [0.0, 0.5, 1.0],
+            begin: Alignment(-0.6, -1.0),
+            end: Alignment(1.0, 1.0),
           ),
           borderRadius: AppRadius.extraLarge,
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.40),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
+              color: AppColors.primary.withValues(alpha: 0.30),
+              blurRadius: 20,
+              spreadRadius: -2,
+              offset: const Offset(0, 7),
             ),
           ],
         ),

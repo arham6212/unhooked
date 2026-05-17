@@ -28,10 +28,19 @@ class AppCard extends StatelessWidget {
         color: cardColor,
         borderRadius: AppRadius.large,
         boxShadow: [
+          // Outer diffuse — blue-tinted ambient lift
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+            color: const Color(0xFF2563FF).withValues(alpha: 0.055),
+            blurRadius: 24,
+            spreadRadius: 0,
+            offset: const Offset(0, 6),
+          ),
+          // Inner sharp — subtle depth contact shadow
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.025),
+            blurRadius: 4,
+            spreadRadius: 0,
+            offset: const Offset(0, 1),
           ),
         ],
       ),
