@@ -15,7 +15,7 @@ class StreakDisplaySection extends StatelessWidget {
       height: 380,
       decoration: const BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/stepping_stones_bg.png'),
+          image: AssetImage('assets/images/abstract_minimal_bg.png'),
           fit: BoxFit.cover,
         ),
       ),
