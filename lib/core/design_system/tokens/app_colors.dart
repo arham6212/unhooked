@@ -41,7 +41,9 @@ class AppColors {
   static const Color surface     = Color(0xFFFFFFFF);
   static const Color surfaceDark = Color(0xFF161B27); // dark card
   static const Color divider     = Color(0xFFEEF0F6); // very subtle
+  static const Color dividerDark = Color(0xFF2A3143); // dark divider
   static const Color border      = Color(0xFFE5E9F4); // card borders
+  static const Color borderDark  = Color(0xFF2D3748); // dark card borders
 
   // ── Text hierarchy (semantic scale) ───────────────────────────
   // Use these instead of the individual text* constants for new widgets.
@@ -60,7 +62,7 @@ class AppColors {
   // ── Semantic ──────────────────────────────────────────────────
   static const Color error   = Color(0xFFEF4444); // red — danger/relapse
   static const Color success = Color(0xFF22C55E); // green — clean days
-  static const Color warning = Color(0xFFF59E0B); // amber — mild alert
+  static const Color warning = Color(0xFFFFC107); // amber — mild alert
   static const Color info    = Color(0xFF3B82F6); // blue — informational
 
   // ── Calendar / streak grid ────────────────────────────────────
@@ -73,7 +75,7 @@ class AppColors {
     Color(0xFF3B82F6), // blue
     Color(0xFF8B5CF6), // violet
     Color(0xFF10B981), // emerald
-    Color(0xFFF59E0B), // amber
+    Color(0xFFFFC107), // amber
     Color(0xFFEC4899), // pink
     Color(0xFF06B6D4), // cyan
   ];

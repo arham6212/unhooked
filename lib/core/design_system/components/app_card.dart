@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../tokens/app_colors.dart';
 import '../tokens/app_radius.dart';
@@ -8,6 +9,7 @@ class AppCard extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final Color? color;
   final VoidCallback? onTap;
+  final bool glass;
 
   const AppCard({
     super.key,
@@ -15,29 +17,34 @@ class AppCard extends StatelessWidget {
     this.padding = const EdgeInsets.all(AppSpacing.lg),
     this.color,
     this.onTap,
+    this.glass = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cardColor = color ?? theme.cardTheme.color ?? AppColors.surface;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final defaultColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final cardColor = color ?? defaultColor;
+    
+    final borderColor = isDark ? AppColors.borderDark : AppColors.border;
 
     Widget content = Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: cardColor,
+        color: glass ? cardColor.withValues(alpha: 0.7) : cardColor,
         borderRadius: AppRadius.large,
-        boxShadow: [
-          // Outer diffuse — blue-tinted ambient lift
+        border: Border.all(color: borderColor),
+        boxShadow: glass ? [] : [
+          // Outer diffuse — blue-tinted ambient lift (subtle for dark mode)
           BoxShadow(
-            color: const Color(0xFF2563FF).withValues(alpha: 0.055),
+            color: isDark ? Colors.black.withValues(alpha: 0.3) : const Color(0xFF2563FF).withValues(alpha: 0.04),
             blurRadius: 24,
             spreadRadius: 0,
             offset: const Offset(0, 6),
           ),
           // Inner sharp — subtle depth contact shadow
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.025),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 4,
             spreadRadius: 0,
             offset: const Offset(0, 1),
@@ -47,10 +54,24 @@ class AppCard extends StatelessWidget {
       child: child,
     );
 
+    if (glass) {
+      content = ClipRRect(
+        borderRadius: AppRadius.large,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: content,
+        ),
+      );
+    }
+
     if (onTap != null) {
-      return GestureDetector(
-        onTap: onTap,
-        child: content,
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: AppRadius.large,
+          child: content,
+        ),
       );
     }
     return content;

@@ -39,7 +39,7 @@ const List<RecoveryBenefit> _kBenefits = [
     title: 'First day clear',
     description: 'Your body begins to clear the substance. Hydration and rest help.',
     icon: LucideIcons.sun,
-    color: Color(0xFFF59E0B),
+    color: AppColors.warning,
   ),
   RecoveryBenefit(
     days: 3,
@@ -95,7 +95,7 @@ const List<RecoveryBenefit> _kBenefits = [
     title: 'Major milestone',
     description: 'A full year of choices. Celebrate and keep building.',
     icon: LucideIcons.partyPopper,
-    color: Color(0xFFF59E0B),
+    color: AppColors.warning,
   ),
   RecoveryBenefit(
     days: 730,

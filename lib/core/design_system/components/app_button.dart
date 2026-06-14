@@ -6,7 +6,7 @@ import '../tokens/app_typography.dart';
 
 enum AppButtonVariant { primary, secondary, text, gradient }
 
-class AppButton extends StatelessWidget {
+class AppButton extends StatefulWidget {
   final String text;
   final VoidCallback? onPressed;
   final AppButtonVariant variant;
@@ -25,19 +25,71 @@ class AppButton extends StatelessWidget {
   });
 
   @override
+  State<AppButton> createState() => _AppButtonState();
+}
+
+class _AppButtonState extends State<AppButton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    if (!widget.isLoading && widget.onPressed != null) {
+      _controller.forward();
+    }
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    _controller.reverse();
+  }
+
+  void _onTapCancel() {
+    _controller.reverse();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (variant == AppButtonVariant.gradient) {
+    return GestureDetector(
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: _buildButton(context),
+      ),
+    );
+  }
+
+  Widget _buildButton(BuildContext context) {
+    if (widget.variant == AppButtonVariant.gradient) {
       return _buildGradientButton();
     }
 
-    final isPrimary = variant == AppButtonVariant.primary;
-    final isText = variant == AppButtonVariant.text;
+    final isPrimary = widget.variant == AppButtonVariant.primary;
+    final isText = widget.variant == AppButtonVariant.text;
 
     final bgColor = isPrimary ? AppColors.primary : (isText ? Colors.transparent : AppColors.backgroundLight);
     final fgColor = isPrimary ? AppColors.onPrimary : AppColors.textPrimary;
 
     Widget button = FilledButton(
-      onPressed: isLoading ? null : onPressed,
+      onPressed: widget.isLoading ? null : widget.onPressed,
       style: FilledButton.styleFrom(
         backgroundColor: bgColor,
         foregroundColor: fgColor,
@@ -48,7 +100,7 @@ class AppButton extends StatelessWidget {
       child: _buildChild(fgColor),
     );
 
-    if (fullWidth) {
+    if (widget.fullWidth) {
       return SizedBox(width: double.infinity, child: button);
     }
     return button;
@@ -56,7 +108,7 @@ class AppButton extends StatelessWidget {
 
   Widget _buildGradientButton() {
     Widget content = InkWell(
-      onTap: isLoading ? null : onPressed,
+      onTap: widget.isLoading ? null : widget.onPressed,
       borderRadius: AppRadius.extraLarge,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
@@ -78,24 +130,24 @@ class AppButton extends StatelessWidget {
           ],
         ),
         child: Center(
-          widthFactor: fullWidth ? null : 1.0,
+          widthFactor: widget.fullWidth ? null : 1.0,
           child: _buildChild(AppColors.onPrimary),
         ),
       ),
     );
 
-    if (isLoading || onPressed == null) {
+    if (widget.isLoading || widget.onPressed == null) {
       content = Opacity(opacity: 0.5, child: content);
     }
     
-    if (fullWidth) {
+    if (widget.fullWidth) {
       return SizedBox(width: double.infinity, child: content);
     }
     return content;
   }
 
   Widget _buildChild(Color color) {
-    if (isLoading) {
+    if (widget.isLoading) {
       return SizedBox(
         width: 20,
         height: 20,
@@ -103,17 +155,17 @@ class AppButton extends StatelessWidget {
       );
     }
 
-    if (icon != null) {
+    if (widget.icon != null) {
       return Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 20, color: color),
+          Icon(widget.icon, size: 20, color: color),
           const SizedBox(width: AppSpacing.sm),
-          Text(text, style: AppTypography.button.copyWith(color: color)),
+          Text(widget.text, style: AppTypography.button.copyWith(color: color)),
         ],
       );
     }
-    return Text(text, style: AppTypography.button.copyWith(color: color));
+    return Text(widget.text, style: AppTypography.button.copyWith(color: color));
   }
 }

@@ -19,16 +19,32 @@ class NavigationShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selectedTab = BottomTab.values[shell.currentIndex];
+    final isHome = shell.currentIndex == 0;
 
     return Scaffold(
       extendBody: true,
-      body: shell,
-      bottomNavigationBar: BottomNavBar(
-        selectedTab: selectedTab,
-        onTap: (tab) {
-          _onTabSelected(tab.index);
-        },
-      ),
+      body: isHome
+          ? Stack(
+              children: [
+                shell,
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: VerticalEdgeNavBar(
+                    selectedTab: selectedTab,
+                    onTap: (tab) => _onTabSelected(tab.index),
+                  ),
+                ),
+              ],
+            )
+          : shell,
+      bottomNavigationBar: isHome
+          ? null
+          : BottomNavBar(
+              selectedTab: selectedTab,
+              onTap: (tab) => _onTabSelected(tab.index),
+            ),
     );
   }
 }

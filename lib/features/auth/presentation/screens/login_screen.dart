@@ -1,228 +1,149 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+
 import '../providers/auth_provider.dart';
 import '../../../../core/design_system/tokens/app_colors.dart';
 import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
 import '../../../../core/design_system/tokens/app_radius.dart';
 import '../../../../core/design_system/components/app_button.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-class LoginScreen extends ConsumerStatefulWidget {
+import '../../../../core/design_system/components/app_card.dart';
+
+class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
 
   @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends ConsumerState<LoginScreen> with TickerProviderStateMixin {
-  late AnimationController _controller;
-  late AnimationController _pulseController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _pulseAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    );
-
-    _pulseController = AnimationController(
-        vsync: this,
-        duration: const Duration(seconds: 2),
-      )..repeat(reverse: true);
-
-    _fadeAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.2, 0.8, curve: Curves.easeOutBack),
-    ));
-
-    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.6, curve: Curves.elasticOut),
-      ),
-    );
-
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
-      CurvedAnimation(
-        parent: _pulseController,
-        curve: Curves.easeInOut,
-      ),
-    );
-
-    _controller.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
     final isBusy = authState.isLoading;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          // Subtle 3-point cool-white gradient — clean like Apple Health
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFF0F4FF), // faint blue wash at top
-              Color(0xFFF7F8FC), // neutral mid
-              Color(0xFFFFFFFF), // pure white at bottom
-            ],
-            stops: [0.0, 0.5, 1.0],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.xl),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Spacer(),
-                // Animated Logo
-                ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: AnimatedBuilder(
-                      animation: _pulseAnimation,
-                      builder: (context, child) {
-                        return Transform.scale(
-                          scale: _pulseAnimation.value,
-                          child: Container(
-                            padding: const EdgeInsets.all(AppSpacing.xl),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: const LinearGradient(
-                                begin: Alignment(-0.6, -1.0),
-                                end: Alignment(1.0, 1.0),
-                                colors: [
-                                  AppColors.primaryDark,
-                                  AppColors.primary,
-                                  AppColors.primaryLight,
-                                ],
-                                stops: [0.0, 0.5, 1.0],
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.30),
-                                  blurRadius: 40,
-                                  spreadRadius: 0,
-                                  offset: const Offset(0, 8),
-                                ),
-                                BoxShadow(
-                                  color: AppColors.primaryLight.withValues(alpha: 0.18),
-                                  blurRadius: 60,
-                                  spreadRadius: 8,
-                                  offset: Offset.zero,
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              LucideIcons.sparkles,
-                              size: 72,
-                              color: AppColors.onPrimary,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      body: Stack(
+        children: [
+          // Background soft glowing mesh
+          Positioned(
+            top: -150,
+            left: -100,
+            child: Container(
+              width: 400,
+              height: 400,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    AppColors.primary.withValues(alpha: 0.15),
+                    Colors.transparent,
+                  ],
+                  stops: const [0.1, 1.0],
                 ),
-                const SizedBox(height: AppSpacing.xl),
-                // Title and Subtitle with stagger
-                SlideTransition(
-                  position: _slideAnimation,
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: Column(
-                      children: [
-                        Text(
-                          'Recover Me',
-                          style: AppTypography.heading1,
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-                        Text(
-                          'Your companion on the road to recovery.\nSimple. Secure. Supportive.',
-                          textAlign: TextAlign.center,
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.textMutedAlt,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                if (authState.error != null) ...[
-                  FadeTransition(
-                    opacity: _fadeAnimation,
+              ),
+            ),
+          ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+           .scale(begin: const Offset(1, 1), end: const Offset(1.1, 1.1), duration: 4.seconds, curve: Curves.easeInOut),
+           
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.xxl),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Spacer(),
+                  
+                  // Logo Mark
+                  Center(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+                      width: 80,
+                      height: 80,
                       decoration: BoxDecoration(
-                        color: AppColors.error.withValues(alpha: 0.1),
-                        borderRadius: AppRadius.small,
+                        gradient: const LinearGradient(
+                          colors: [AppColors.primaryDark, AppColors.primaryLight],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: AppRadius.extraLarge,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.25),
+                            blurRadius: 30,
+                            offset: const Offset(0, 10),
+                          )
+                        ],
                       ),
-                      child: Text(
-                        authState.error!,
-                        textAlign: TextAlign.center,
-                        style: AppTypography.bodyMedium.copyWith(color: AppColors.error),
+                      child: const Icon(
+                        LucideIcons.sparkles,
+                        color: AppColors.onPrimary,
+                        size: 40,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.xl),
-                ],
-                // Button with slide/fade
-                SlideTransition(
-                  position: _slideAnimation,
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: AppButton(
-                      text: 'Continue with Google',
-                      isLoading: isBusy,
-                      fullWidth: true,
-                      icon: isBusy ? null : LucideIcons.logIn, // Google icon missing from generic icons, fall back to login icon or no icon.
-                      onPressed: () => ref.read(authProvider.notifier).signInWithGoogle(),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 32),
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: Text(
+                  ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack).fadeIn(duration: 400.ms),
+                  
+                  const SizedBox(height: AppSpacing.xxl),
+                  
+                  // Typography
+                  Text(
+                    'Recover Me',
+                    textAlign: TextAlign.center,
+                    style: AppTypography.display.copyWith(fontSize: 44, height: 1.1),
+                  ).animate().slideY(begin: 0.2, end: 0, duration: 500.ms, curve: Curves.easeOutCubic).fadeIn(delay: 100.ms),
+                  
+                  const SizedBox(height: AppSpacing.md),
+                  
+                  Text(
+                    'Your companion on the road to recovery.\nSimple. Secure. Supportive.',
+                    textAlign: TextAlign.center,
+                    style: AppTypography.bodyLarge.copyWith(color: AppColors.textMuted),
+                  ).animate().slideY(begin: 0.2, end: 0, duration: 500.ms, curve: Curves.easeOutCubic).fadeIn(delay: 200.ms),
+                  
+                  const Spacer(),
+                  
+                  if (authState.error != null) ...[
+                    AppCard(
+                      color: AppColors.error.withValues(alpha: 0.1),
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      child: Row(
+                        children: [
+                          const Icon(LucideIcons.alertCircle, color: AppColors.error, size: 20),
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            child: Text(
+                              authState.error!,
+                              style: AppTypography.bodyMedium.copyWith(color: AppColors.error),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.1, end: 0),
+                    const SizedBox(height: AppSpacing.xl),
+                  ],
+                  
+                  // Login Button
+                  AppButton(
+                    text: 'Continue with Google',
+                    isLoading: isBusy,
+                    fullWidth: true,
+                    icon: LucideIcons.chrome, // Generic substitute for Google
+                    onPressed: () => ref.read(authProvider.notifier).signInWithGoogle(),
+                  ).animate().slideY(begin: 0.2, end: 0, duration: 500.ms, curve: Curves.easeOutCubic).fadeIn(delay: 300.ms),
+                  
+                  const SizedBox(height: AppSpacing.xxl),
+                  
+                  // Footer
+                  Text(
                     'By continuing, you agree to our Terms and Privacy Policy.',
                     textAlign: TextAlign.center,
                     style: AppTypography.caption,
-                  ),
-                ),
-              ],
+                  ).animate().fadeIn(delay: 400.ms, duration: 500.ms),
+                ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
 }
-

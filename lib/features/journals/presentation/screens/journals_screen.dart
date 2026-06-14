@@ -104,8 +104,10 @@ class _JournalScreenState extends State<JournalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,7 +123,10 @@ class _JournalScreenState extends State<JournalScreen> {
       ),
       floatingActionButton: _entries.isEmpty
           ? null
-          : _WriteFab(onPressed: _openCompose),
+          : Padding(
+              padding: const EdgeInsets.only(bottom: 80), // Push above global BottomNavBar
+              child: _WriteFab(onPressed: _openCompose),
+            ),
     );
   }
 }
@@ -181,13 +186,15 @@ class _CircleBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: isDark ? AppColors.surfaceDark : AppColors.surface,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
@@ -321,11 +328,13 @@ class _EntryCard extends StatelessWidget {
     final truncated = entry.body.length > 120
         ? '${entry.body.substring(0, 120)}…'
         : entry.body;
+        
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
         borderRadius: AppRadius.extraLarge,
         boxShadow: [
           BoxShadow(

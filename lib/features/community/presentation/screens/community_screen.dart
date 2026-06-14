@@ -6,7 +6,6 @@ import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
 import '../../../../core/design_system/tokens/app_radius.dart';
 import '../../../../core/design_system/components/app_text_field.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../providers/posts_provider.dart';
 import '../widgets/error_view.dart';
 import '../widgets/post_list_widget.dart';
@@ -228,13 +227,14 @@ class _IconBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? AppColors.surfaceDark : AppColors.surface,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
@@ -244,7 +244,7 @@ class _IconBtn extends StatelessWidget {
             ),
           ],
         ),
-        child: Icon(icon, size: 20, color: kColorTextPrimary),
+        child: Icon(icon, size: 20, color: AppColors.textPrimary),
       ),
     );
   }

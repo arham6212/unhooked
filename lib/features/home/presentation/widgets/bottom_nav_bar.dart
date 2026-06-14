@@ -1,10 +1,11 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '../models/bottom_tab.dart';
 import '../../../../core/design_system/tokens/app_colors.dart';
 import '../../../../core/design_system/tokens/app_spacing.dart';
-import '../../../../core/design_system/tokens/app_typography.dart';
 import '../../../../core/design_system/tokens/app_radius.dart';
 
 class BottomNavBar extends StatelessWidget {
@@ -21,47 +22,55 @@ class BottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final bottomPad = MediaQuery.paddingOf(context).bottom;
 
-    // Outer wrapper provides the floating margin + safe-area spacing
-    return Padding(
-      padding: EdgeInsets.fromLTRB(14, 0, 14, (bottomPad > 0 ? bottomPad : 10) + 2),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.sm,
-        ),
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+
+    // Use SafeArea or bottom padding to ensure it floats well above the bottom.
+    // By returning it from the Scaffold's bottomNavigationBar property,
+    // Flutter will automatically push FABs up so they don't collide.
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+        child: ClipRRect(
           borderRadius: AppRadius.extraLarge,
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.10),
-              blurRadius: 28,
-              spreadRadius: -2,
-              offset: const Offset(0, 8),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF161616).withValues(alpha: 0.8) : Colors.white.withValues(alpha: 0.85),
+                borderRadius: AppRadius.extraLarge,
+                border: Border.all(
+                  color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05),
+                ),
+                boxShadow: [
+                  if (!isDark)
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    )
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: BottomTab.values.map((tab) {
+                  final selected = tab == selectedTab;
+                  return Expanded(
+                    child: _NavItem(
+                      tab: tab,
+                      selected: selected,
+                      isDark: isDark,
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        onTap(tab);
+                      },
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: BottomTab.values.map((tab) {
-            final selected = tab == selectedTab;
-            return _NavItem(
-              tab: tab,
-              selected: selected,
-              isDark: isDark,
-              onTap: () {
-                HapticFeedback.selectionClick();
-                onTap(tab);
-              },
-            );
-          }).toList(),
+          ),
         ),
       ),
     );
@@ -83,60 +92,30 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = selected ? AppColors.primary : (isDark ? AppColors.textMutedAlt : AppColors.textMuted);
+
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+      child: Container(
+        height: 50,
         decoration: BoxDecoration(
-          color: selected
-              ? AppColors.primary.withValues(alpha: 0.1)
-              : Colors.transparent,
-          borderRadius: AppRadius.large,
+          color: selected ? AppColors.primary.withValues(alpha: 0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(100),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AnimatedScale(
-              scale: selected ? 1.12 : 1.0,
-              duration: const Duration(milliseconds: 220),
-              curve: Curves.easeOutBack,
-              child: Icon(
-                tab.icon,
-                size: 22,
-                color: selected
-                    ? AppColors.primary
-                    : (isDark ? AppColors.textMuted : AppColors.textMutedAlt),
-              ),
+        child: Center(
+          child: AnimatedScale(
+            scale: selected ? 1.15 : 1.0,
+            duration: 250.ms,
+            curve: Curves.easeOutBack,
+            child: Icon(
+              tab.icon,
+              color: color,
+              size: 22,
             ),
-            const SizedBox(height: AppSpacing.xs),
-            AnimatedDefaultTextStyle(
-              duration: const Duration(milliseconds: 220),
-              style: AppTypography.caption.copyWith(
-                fontSize: 11,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                color: selected
-                    ? AppColors.primary
-                    : (isDark ? AppColors.textMuted : AppColors.textMutedAlt),
-              ),
-              child: Text(tab.label),
-            ),
-            const SizedBox(height: 3),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              curve: Curves.easeOutCubic,
-              width: selected ? 16 : 0,
-              height: 3,
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: AppRadius.circular,
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+      ).animate(target: selected ? 1 : 0).shimmer(duration: 800.ms, color: AppColors.primaryLight.withValues(alpha: 0.2)),
     );
   }
 }

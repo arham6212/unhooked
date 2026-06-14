@@ -13,78 +13,129 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.only(bottom: 40),
+          padding: const EdgeInsets.only(bottom: 120),
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(22, 18, 22, 0),
               child: Text(
                 'Settings',
-                style: AppTypography.heading1.copyWith(height: 1.1, letterSpacing: -0.5),
+                style: AppTypography.heading1.copyWith(
+                  height: 1.1, 
+                  letterSpacing: -0.5,
+                  color: isDark ? Colors.white : AppColors.textPrimary,
+                ),
               ),
             ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.xl),
             _ProfileCard(),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.xl),
             _SectionLabel('Account'),
-            _SettingsTile(
-              icon: LucideIcons.user,
-              label: 'Profile',
-              subtitle: 'Edit your display name and avatar',
-              onTap: () {},
+            _SettingsGroup(
+              children: [
+                _SettingsTile(
+                  icon: LucideIcons.user,
+                  label: 'Profile',
+                  onTap: () {},
+                ),
+                _SettingsTile(
+                  icon: LucideIcons.bell,
+                  label: 'Notifications',
+                  onTap: () {},
+                  trailing: Switch(
+                    value: true,
+                    onChanged: (_) {},
+                    activeThumbColor: Colors.white,
+                    activeTrackColor: AppColors.primary,
+                  ),
+                ),
+                _SettingsTile(
+                  icon: LucideIcons.lock,
+                  label: 'Privacy',
+                  onTap: () {},
+                  isLast: true,
+                ),
+              ],
             ),
-            _SettingsTile(
-              icon: LucideIcons.bell,
-              label: 'Notifications',
-              subtitle: 'Daily check-ins and milestone alerts',
-              onTap: () {},
-              trailing: Switch(
-                value: true,
-                onChanged: (_) {},
-                activeThumbColor: AppColors.primary,
-                activeTrackColor: AppColors.primary.withValues(alpha: 0.4),
-              ),
-            ),
-            _SettingsTile(
-              icon: LucideIcons.lock,
-              label: 'Privacy',
-              subtitle: 'Control who sees your posts',
-              onTap: () {},
-            ),
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.lg),
             _SectionLabel('Support'),
-            _SettingsTile(
-              icon: LucideIcons.info,
-              label: 'About Recover Me',
-              onTap: () {},
+            _SettingsGroup(
+              children: [
+                _SettingsTile(
+                  icon: LucideIcons.info,
+                  label: 'About Recover Me',
+                  onTap: () {},
+                ),
+                _SettingsTile(
+                  icon: LucideIcons.helpCircle,
+                  label: 'Help & Support',
+                  onTap: () {},
+                ),
+                _SettingsTile(
+                  icon: LucideIcons.fileText,
+                  label: 'Terms & Privacy',
+                  onTap: () {},
+                  isLast: true,
+                ),
+              ],
             ),
-            _SettingsTile(
-              icon: LucideIcons.helpCircle,
-              label: 'Help & Support',
-              onTap: () {},
-            ),
-            _SettingsTile(
-              icon: LucideIcons.fileText,
-              label: 'Terms & Privacy',
-              onTap: () {},
-            ),
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.lg),
             _SectionLabel('Danger zone'),
-            _SettingsTile(
-              icon: LucideIcons.logOut,
-              label: 'Log out',
-              labelColor: AppColors.error,
-              iconColor: AppColors.error,
-              onTap: () {
-                ref.read(authProvider.notifier).logout();
-                context.go('/login');
-              },
+            _SettingsGroup(
+              children: [
+                _SettingsTile(
+                  icon: LucideIcons.logOut,
+                  label: 'Log out',
+                  labelColor: AppColors.error,
+                  iconColor: AppColors.error,
+                  isLast: true,
+                  onTap: () {
+                    ref.read(authProvider.notifier).logout();
+                    context.go('/login');
+                  },
+                ),
+              ],
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SettingsGroup extends StatelessWidget {
+  final List<Widget> children;
+  
+  const _SettingsGroup({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        borderRadius: AppRadius.extraLarge,
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : AppColors.border,
+        ),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
+        ],
+      ),
+      child: Column(
+        children: children,
       ),
     );
   }
@@ -95,21 +146,21 @@ class _ProfileCard extends StatelessWidget {
   Widget build(BuildContext context) {
     const streak = 12;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 18),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [AppColors.primaryDark, AppColors.primaryLight],
+            colors: [AppColors.primaryDark, AppColors.primary, AppColors.primaryLight],
           ),
           borderRadius: AppRadius.extraLarge,
           boxShadow: [
             BoxShadow(
-              color: AppColors.primaryDark.withValues(alpha: 0.3),
-              blurRadius: 18,
-              offset: const Offset(0, 6),
+              color: AppColors.primary.withValues(alpha: 0.25),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
@@ -122,7 +173,7 @@ class _ProfileCard extends StatelessWidget {
                 color: AppColors.onPrimary.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: AppColors.onPrimary.withValues(alpha: 0.4),
+                  color: AppColors.onPrimary.withValues(alpha: 0.3),
                   width: 2,
                 ),
               ),
@@ -140,35 +191,11 @@ class _ProfileCard extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 4),
                   Text(
                     'Day $streak of recovery',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.onPrimary.withValues(alpha: 0.75),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.xs,
-              ),
-              decoration: BoxDecoration(
-                color: AppColors.onPrimary.withValues(alpha: 0.15),
-                borderRadius: AppRadius.circular,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(LucideIcons.flame, color: AppColors.onPrimary, size: 13),
-                  const SizedBox(width: 4),
-                  Text(
-                    '$streak',
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.onPrimary,
-                      fontWeight: FontWeight.w700,
+                      color: AppColors.onPrimary.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -188,14 +215,14 @@ class _SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 4, 22, 6),
+      padding: const EdgeInsets.fromLTRB(28, 4, 22, 8),
       child: Text(
         label.toUpperCase(),
         style: AppTypography.caption.copyWith(
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.8,
-          color: AppColors.textMuted,
-          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.5,
+          color: Theme.of(context).brightness == Brightness.dark ? AppColors.textMuted : AppColors.textMuted,
+          fontSize: 12,
         ),
       ),
     );
@@ -206,80 +233,62 @@ class _SettingsTile extends StatelessWidget {
   const _SettingsTile({
     required this.icon,
     required this.label,
-    this.subtitle,
     required this.onTap,
     this.trailing,
     this.labelColor,
     this.iconColor,
+    this.isLast = false,
   });
 
   final IconData icon;
   final String label;
-  final String? subtitle;
   final VoidCallback onTap;
   final Widget? trailing;
   final Color? labelColor;
   final Color? iconColor;
+  final bool isLast;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 2),
-      child: Material(
-        color: AppColors.surface,
-        borderRadius: AppRadius.large,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: AppRadius.large,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.md,
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: (iconColor ?? AppColors.primary).withValues(alpha: 0.08),
-                    borderRadius: AppRadius.small,
-                  ),
-                  child: Icon(icon, size: 17, color: iconColor ?? AppColors.primary),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: 14,
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: (iconColor ?? AppColors.primary).withValues(alpha: 0.1),
+                  borderRadius: AppRadius.small,
                 ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        label,
-                        style: AppTypography.bodyMedium.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: labelColor ?? AppColors.textPrimary,
-                        ),
-                      ),
-                      if (subtitle != null) ...[
-                        const SizedBox(height: 1),
-                        Text(
-                          subtitle!,
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.textMuted,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ],
+                child: Icon(icon, size: 16, color: iconColor ?? AppColors.primary),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text(
+                  label,
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: labelColor ?? (isDark ? Colors.white : AppColors.textPrimary),
                   ),
                 ),
-                trailing ??
-                    Icon(
-                      LucideIcons.chevronRight,
-                      size: 16,
-                      color: AppColors.textMuted.withValues(alpha: 0.5),
-                    ),
-              ],
-            ),
+              ),
+              trailing ??
+                  Icon(
+                    LucideIcons.chevronRight,
+                    size: 16,
+                    color: isDark ? AppColors.textMuted : AppColors.textMuted.withValues(alpha: 0.5),
+                  ),
+            ],
           ),
         ),
       ),
