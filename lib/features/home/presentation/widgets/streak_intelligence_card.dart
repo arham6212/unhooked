@@ -24,21 +24,27 @@ class StreakIntelligenceCard extends StatelessWidget {
             'STREAK INTELLIGENCE',
             style: AppTypography.label.copyWith(color: AppColors.textMuted),
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.sm),
           _buildRow(
             icon: LucideIcons.trophy,
             iconColor: AppColors.warning,
-            iconBg: AppColors.warning.withValues(alpha: 0.1),
             label: 'BEST',
             value: '127',
           ),
-          const Divider(height: AppSpacing.md, color: AppColors.divider),
+          const Divider(height: AppSpacing.sm, color: AppColors.divider),
           _buildRow(
             icon: LucideIcons.target,
             iconColor: AppColors.primary,
-            iconBg: AppColors.primary.withValues(alpha: 0.1),
             label: 'NEXT',
             value: '150',
+          ),
+          const Divider(height: AppSpacing.sm, color: AppColors.divider),
+          _buildRow(
+            icon: LucideIcons.hourglass,
+            iconColor: AppColors.success,
+            label: 'LEFT',
+            value: '23',
+            valueColor: AppColors.success,
           ),
         ],
       ),
@@ -48,33 +54,21 @@ class StreakIntelligenceCard extends StatelessWidget {
   Widget _buildRow({
     required IconData icon,
     required Color iconColor,
-    required Color iconBg,
     required String label,
     required String value,
     Color? valueColor,
-    bool isValueText = false,
   }) {
     return Row(
       children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: iconBg,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: iconColor, size: 20),
-        ),
+        Icon(icon, color: iconColor, size: 24),
         const SizedBox(width: AppSpacing.md),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: AppTypography.caption),
+            Text(label, style: AppTypography.label),
             Text(
               value,
-              style: isValueText
-                  ? AppTypography.heading3.copyWith(color: valueColor ?? AppColors.textPrimary)
-                  : AppTypography.heading2.copyWith(color: valueColor ?? AppColors.textPrimary),
+              style: AppTypography.heading3.copyWith(color: valueColor ?? AppColors.textPrimary),
             ),
           ],
         ),
