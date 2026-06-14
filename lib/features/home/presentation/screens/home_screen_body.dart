@@ -41,15 +41,13 @@ class _HomeScreenBodyState extends ConsumerState<HomeScreenBody> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                        child: IntrinsicHeight(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              const Expanded(child: StreakIntelligenceCard()),
-                              const SizedBox(width: AppSpacing.md),
-                              const Expanded(child: Last30DaysCard()),
-                            ],
-                          ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Expanded(child: StreakIntelligenceCard()),
+                            const SizedBox(width: AppSpacing.md),
+                            const Expanded(child: Last30DaysCard()),
+                          ],
                         ),
                       ),
                       const SizedBox(height: AppSpacing.xl),
