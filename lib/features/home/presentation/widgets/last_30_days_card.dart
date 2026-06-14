@@ -24,34 +24,28 @@ class Last30DaysCard extends StatelessWidget {
             style: AppTypography.label.copyWith(color: AppColors.textMuted),
           ),
           const SizedBox(height: AppSpacing.md),
-          Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                // Determine item size based on constraints
-                return GridView.builder(
-                  padding: EdgeInsets.zero,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 7,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
-                  ),
-                  itemCount: 35, // 7x5
-                  itemBuilder: (context, index) {
-                    bool isRed = (index == 11 || index == 13 || index == 20);
-                    bool isEmpty = index > 29;
-                    if (isEmpty) return const SizedBox();
-                    
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: isRed ? AppColors.error : AppColors.primary,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    );
-                  },
-                );
-              }
+          GridView.builder(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 7,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
             ),
+            itemCount: 35, // 7x5
+            itemBuilder: (context, index) {
+              bool isRed = (index == 11 || index == 13 || index == 20);
+              bool isEmpty = index > 29;
+              if (isEmpty) return const SizedBox();
+              
+              return Container(
+                decoration: BoxDecoration(
+                  color: isRed ? AppColors.error : AppColors.primary,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              );
+            },
           ),
         ],
       ),
