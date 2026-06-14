@@ -32,7 +32,7 @@ class StreakIntelligenceCard extends StatelessWidget {
             label: 'BEST',
             value: '127',
           ),
-          const Divider(height: AppSpacing.xl, color: AppColors.divider),
+          const Divider(height: AppSpacing.md, color: AppColors.divider),
           _buildRow(
             icon: LucideIcons.target,
             iconColor: AppColors.primary,
@@ -40,7 +40,7 @@ class StreakIntelligenceCard extends StatelessWidget {
             label: 'NEXT',
             value: '150',
           ),
-          const Divider(height: AppSpacing.xl, color: AppColors.divider),
+          const Divider(height: AppSpacing.md, color: AppColors.divider),
           _buildRow(
             icon: LucideIcons.hourglass,
             iconColor: AppColors.success,
@@ -48,16 +48,6 @@ class StreakIntelligenceCard extends StatelessWidget {
             label: 'LEFT',
             value: '23',
             valueColor: AppColors.success,
-          ),
-          const Divider(height: AppSpacing.xl, color: AppColors.divider),
-          _buildRow(
-            icon: LucideIcons.flame,
-            iconColor: const Color(0xFFE85D04), // Orange, allowed for specific icon match per user request
-            iconBg: const Color(0xFFE85D04).withValues(alpha: 0.1),
-            label: 'MOMENTUM',
-            value: 'EXCELLENT',
-            valueColor: const Color(0xFFE85D04),
-            isValueText: true,
           ),
         ],
       ),
