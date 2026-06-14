@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/design_system/tokens/app_colors.dart';
@@ -58,11 +57,11 @@ class StreakDisplaySection extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildTimeBlock('14', 'HRS'),
-              const SizedBox(width: AppSpacing.md),
-              _buildTimeBlock('22', 'MINS'),
-              const SizedBox(width: AppSpacing.md),
-              _buildTimeBlock('08', 'SECS'),
+              _buildMinimalTimeBlock('14', 'h'),
+              const SizedBox(width: AppSpacing.lg),
+              _buildMinimalTimeBlock('22', 'm'),
+              const SizedBox(width: AppSpacing.lg),
+              _buildMinimalTimeBlock('08', 's'),
             ],
           ),
           const SizedBox(height: AppSpacing.xl),
@@ -90,40 +89,27 @@ class StreakDisplaySection extends StatelessWidget {
     );
   }
 
-  Widget _buildTimeBlock(String value, String label) {
-    return ClipRRect(
-      borderRadius: AppRadius.large,
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-        child: Container(
-          width: 64,
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.4),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.6)),
-            borderRadius: AppRadius.large,
-          ),
-          child: Column(
-            children: [
-              Text(
-                value,
-                style: AppTypography.heading3.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primaryDark,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                label,
-                style: AppTypography.label.copyWith(
-                  fontSize: 10,
-                  color: AppColors.primaryDark,
-                ),
-              ),
-            ],
+  Widget _buildMinimalTimeBlock(String value, String unit) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        Text(
+          value,
+          style: AppTypography.heading1.copyWith(
+            color: AppColors.primaryDark,
+            fontWeight: FontWeight.w700,
           ),
         ),
-      ),
+        const SizedBox(width: 2),
+        Text(
+          unit,
+          style: AppTypography.bodyLarge.copyWith(
+            color: AppColors.primaryDark,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 }
