@@ -40,15 +40,6 @@ class StreakIntelligenceCard extends StatelessWidget {
             label: 'NEXT',
             value: '150',
           ),
-          const Divider(height: AppSpacing.md, color: AppColors.divider),
-          _buildRow(
-            icon: LucideIcons.hourglass,
-            iconColor: AppColors.success,
-            iconBg: AppColors.success.withValues(alpha: 0.1),
-            label: 'LEFT',
-            value: '23',
-            valueColor: AppColors.success,
-          ),
         ],
       ),
     );
