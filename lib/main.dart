@@ -29,6 +29,7 @@ class MyApp extends ConsumerWidget {
     });
 
     return MaterialApp.router( // ✅ IMPORTANT
+      title: 'Inner Monk',
       debugShowCheckedModeBanner: false,
 
       routerConfig: ref.watch(routerProvider), // ✅ CONNECT GO ROUTER
