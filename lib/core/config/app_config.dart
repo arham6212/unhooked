@@ -4,5 +4,5 @@ class AppConfig {
 
   // Google Sign-In Client IDs
   static const String googleWebClientId = '168945909842-l7nt36t6kuurt5dsgjs3a15l5j2s38d8.apps.googleusercontent.com';
-  static const String googleAndroidClientId = '168945909842-feq24h8h0q4edmu1vbf33ginhnevnk6v.apps.googleusercontent.com';
+  static const String googleIosClientId = '168945909842-feq24h8h0q4edmu1vbf33ginhnevnk6v.apps.googleusercontent.com';
 }

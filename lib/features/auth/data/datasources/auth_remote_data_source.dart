@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:google_sign_in/google_sign_in.dart' as gsi;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/config/app_config.dart';
@@ -21,7 +22,7 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
   @override
   Future<AuthUserModel?> signInWithGoogle() async {
     await gsi.GoogleSignIn.instance.initialize(
-      clientId: AppConfig.googleAndroidClientId,
+      clientId: Platform.isIOS ? AppConfig.googleIosClientId : null,
       serverClientId: AppConfig.googleWebClientId,
     );
     
