@@ -9,7 +9,8 @@ enum MeditationCategory {
   sleep('Sleep', LucideIcons.moon),
   morning('Morning', LucideIcons.sunrise),
   focus('Focus', LucideIcons.target),
-  gratitude('Gratitude', LucideIcons.heart);
+  gratitude('Gratitude', LucideIcons.heart),
+  music('Music', LucideIcons.music);
 
   final String label;
   final IconData icon;

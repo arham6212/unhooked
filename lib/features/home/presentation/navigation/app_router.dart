@@ -135,6 +135,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'session/:id',
+                    parentNavigatorKey: _rootNavigatorKey,
                     builder: (context, state) {
                       final id = state.pathParameters['id']!;
                       return MeditationSessionScreen(meditationId: id);
@@ -142,6 +143,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                   GoRoute(
                     path: 'complete',
+                    parentNavigatorKey: _rootNavigatorKey,
                     builder: (context, state) {
                       final extra = state.extra as Map<String, dynamic>;
                       return SessionCompleteScreen(

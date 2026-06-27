@@ -19,7 +19,12 @@ final meditationsProvider = Provider<List<Meditation>>((_) => allMeditations);
 final filteredMeditationsProvider = Provider<List<Meditation>>((ref) {
   final category = ref.watch(selectedCategoryProvider);
   final meditations = ref.watch(meditationsProvider);
-  if (category == MeditationCategory.all) return meditations;
+  if (category == MeditationCategory.all) {
+    return meditations.where((m) => 
+      m.category != MeditationCategory.music && 
+      m.category != MeditationCategory.breathing
+    ).toList();
+  }
   return meditations.where((m) => m.category == category).toList();
 });
 

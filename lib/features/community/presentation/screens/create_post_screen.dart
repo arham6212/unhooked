@@ -107,10 +107,12 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
         elevation: 0,
-        leadingWidth: 80,
+        leadingWidth: 100,
         leading: Center(
           child: AppButton(
             text: 'Cancel',
+            fullWidth: true
+            ,
             variant: AppButtonVariant.text,
             onPressed: () => _submitting ? null : context.pop(),
           ),

@@ -48,6 +48,13 @@ class _SessionCompleteScreenState extends State<SessionCompleteScreen> {
             child: Image.asset(
               'assets/images/mountain_lake.jpeg',
               fit: BoxFit.cover,
+            ).animate(
+              onPlay: (controller) => controller.repeat(reverse: true),
+            ).scale(
+              begin: const Offset(1.0, 1.0),
+              end: const Offset(1.05, 1.05),
+              duration: 20.seconds,
+              curve: Curves.easeInOutSine,
             ),
           ),
           Positioned.fill(
@@ -87,6 +94,16 @@ class _SessionCompleteScreenState extends State<SessionCompleteScreen> {
                       size: 44,
                       color: widget.color,
                     ),
+                  ).animate(
+                    onPlay: (controller) => controller.repeat(reverse: true),
+                  ).shimmer(
+                    duration: 2.seconds,
+                    color: widget.color.withValues(alpha: 0.4),
+                  ).scale(
+                    begin: const Offset(1.0, 1.0),
+                    end: const Offset(1.05, 1.05),
+                    duration: 3.seconds,
+                    curve: Curves.easeInOutSine,
                   ).animate().scale(
                         begin: const Offset(0.5, 0.5),
                         end: const Offset(1.0, 1.0),

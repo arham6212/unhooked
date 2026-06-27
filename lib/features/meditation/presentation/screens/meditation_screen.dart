@@ -20,6 +20,12 @@ class MeditationScreen extends ConsumerWidget {
     final selectedCategory = ref.watch(selectedCategoryProvider);
     final filtered = ref.watch(filteredMeditationsProvider);
     final quickStart = ref.watch(quickStartMeditationsProvider);
+    final musicList = ref.watch(meditationsProvider)
+        .where((m) => m.category == MeditationCategory.music)
+        .toList();
+    final exercisesList = ref.watch(meditationsProvider)
+        .where((m) => m.category == MeditationCategory.breathing)
+        .toList();
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
@@ -99,10 +105,13 @@ class MeditationScreen extends ConsumerWidget {
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                        itemCount: MeditationCategory.values.length,
+                        itemCount: MeditationCategory.values.length - 2, // Exclude music and breathing
                         separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
                         itemBuilder: (context, index) {
-                          final cat = MeditationCategory.values[index];
+                          final categories = MeditationCategory.values
+                              .where((c) => c != MeditationCategory.music && c != MeditationCategory.breathing)
+                              .toList();
+                          final cat = categories[index];
                           final isActive = cat == selectedCategory;
                           return _CategoryChip(
                             label: cat.label,
@@ -132,6 +141,50 @@ class MeditationScreen extends ConsumerWidget {
                             .slideY(begin: 0.03, end: 0, duration: 350.ms);
                       },
                     ),
+
+                    if (exercisesList.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.xxxl),
+                      _sectionLabel('EXERCISES'),
+                      const SizedBox(height: AppSpacing.md),
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                        itemCount: exercisesList.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
+                        itemBuilder: (context, index) {
+                          final m = exercisesList[index];
+                          return MeditationCard(
+                            meditation: m,
+                            onTap: () => context.push('/meditate/session/${m.id}'),
+                          ).animate(delay: (50 * index).ms)
+                              .fadeIn(duration: 350.ms)
+                              .slideY(begin: 0.03, end: 0, duration: 350.ms);
+                        },
+                      ),
+                    ],
+
+                    if (musicList.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.xxxl),
+                      _sectionLabel('MUSIC & SOUNDS'),
+                      const SizedBox(height: AppSpacing.md),
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                        itemCount: musicList.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
+                        itemBuilder: (context, index) {
+                          final m = musicList[index];
+                          return MeditationCard(
+                            meditation: m,
+                            onTap: () => context.push('/meditate/session/${m.id}'),
+                          ).animate(delay: (50 * index).ms)
+                              .fadeIn(duration: 350.ms)
+                              .slideY(begin: 0.03, end: 0, duration: 350.ms);
+                        },
+                      ),
+                    ],
 
                     const SizedBox(height: 120),
                   ],

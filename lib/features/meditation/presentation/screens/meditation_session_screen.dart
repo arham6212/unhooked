@@ -25,11 +25,13 @@ class MeditationSessionScreen extends ConsumerStatefulWidget {
 class _MeditationSessionScreenState
     extends ConsumerState<MeditationSessionScreen> {
   Timer? _timer;
+  Timer? _uiTimer;
   int _elapsedSeconds = 0;
   int _currentStepIndex = 0;
   int _stepElapsed = 0;
   bool _isPaused = false;
   bool _isStarted = false;
+  bool _isUIVisible = true;
   Meditation? _meditation;
 
   int get _totalDurationSeconds =>
@@ -48,6 +50,8 @@ class _MeditationSessionScreenState
   void _startSession() {
     setState(() => _isStarted = true);
     HapticFeedback.mediumImpact();
+    _resetUiTimer();
+    
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (_isPaused || _meditation == null) return;
 
@@ -72,10 +76,67 @@ class _MeditationSessionScreenState
   void _togglePause() {
     HapticFeedback.lightImpact();
     setState(() => _isPaused = !_isPaused);
+    _resetUiTimer();
+  }
+  
+  void _seekTo(int seconds) {
+    if (_meditation == null) return;
+    int target = seconds.clamp(0, _totalDurationSeconds);
+    
+    int acc = 0;
+    int targetStep = 0;
+    int targetStepElapsed = 0;
+    
+    for (int i = 0; i < _meditation!.steps.length; i++) {
+      int stepDur = _meditation!.steps[i].durationSeconds;
+      if (acc + stepDur > target) {
+        targetStep = i;
+        targetStepElapsed = target - acc;
+        break;
+      }
+      acc += stepDur;
+    }
+    
+    if (target == _totalDurationSeconds) {
+       _completeSession();
+       return;
+    }
+    
+    setState(() {
+      _elapsedSeconds = target;
+      _currentStepIndex = targetStep;
+      _stepElapsed = targetStepElapsed;
+    });
+    _resetUiTimer();
+  }
+
+  void _resetUiTimer() {
+    _uiTimer?.cancel();
+    if (!_isStarted || _isPaused) {
+       setState(() => _isUIVisible = true);
+       return;
+    }
+    setState(() => _isUIVisible = true);
+    _uiTimer = Timer(const Duration(seconds: 5), () {
+      if (mounted && _isStarted && !_isPaused) {
+        setState(() => _isUIVisible = false);
+      }
+    });
+  }
+
+  void _toggleUI() {
+    if (!_isStarted) return;
+    if (!_isUIVisible) {
+      _resetUiTimer();
+    } else {
+      setState(() => _isUIVisible = false);
+      _uiTimer?.cancel();
+    }
   }
 
   void _completeSession() {
     _timer?.cancel();
+    _uiTimer?.cancel();
     HapticFeedback.heavyImpact();
 
     ref.read(meditationStatsProvider.notifier).addSession(
@@ -95,7 +156,14 @@ class _MeditationSessionScreenState
   @override
   void dispose() {
     _timer?.cancel();
+    _uiTimer?.cancel();
     super.dispose();
+  }
+
+  String _formatTime(int seconds) {
+    final m = (seconds ~/ 60).toString();
+    final s = (seconds % 60).toString().padLeft(2, '0');
+    return '$m:$s';
   }
 
   @override
@@ -110,225 +178,320 @@ class _MeditationSessionScreenState
     final m = _meditation!;
     final totalSec = _totalDurationSeconds;
     final progress = totalSec > 0 ? _elapsedSeconds / totalSec : 0.0;
-    final remaining = totalSec - _elapsedSeconds;
-    final remainMin = (remaining ~/ 60).toString().padLeft(2, '0');
-    final remainSec = (remaining % 60).toString().padLeft(2, '0');
-
+    final remainSec = totalSec - _elapsedSeconds;
     final currentStep = m.steps[_currentStepIndex];
-    final stepProgress = currentStep.durationSeconds > 0
-        ? _stepElapsed / currentStep.durationSeconds
-        : 0.0;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E1A),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Background image
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/mountain_lake.jpeg',
-              fit: BoxFit.cover,
+      body: GestureDetector(
+        onTap: _toggleUI,
+        behavior: HitTestBehavior.opaque,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Background image
+            Positioned.fill(
+              child: Image.asset(
+                'assets/images/mountain_lake.jpeg',
+                fit: BoxFit.cover,
+              ).animate(
+                onPlay: (controller) => controller.repeat(reverse: true),
+              ).scale(
+                begin: const Offset(1.0, 1.0),
+                end: const Offset(1.05, 1.05),
+                duration: 15.seconds,
+                curve: Curves.easeInOutSine,
+              ),
             ),
-          ),
-          // Dark overlay
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    const Color(0xFF0A0E1A).withValues(alpha: 0.7),
-                    const Color(0xFF0A0E1A).withValues(alpha: 0.85),
-                    const Color(0xFF0A0E1A).withValues(alpha: 0.95),
-                  ],
+            // Dark overlay
+            Positioned.fill(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 600),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      const Color(0xFF0A0E1A).withValues(alpha: _isUIVisible ? 0.3 : 0.6),
+                      const Color(0xFF0A0E1A).withValues(alpha: _isUIVisible ? 0.6 : 0.8),
+                      const Color(0xFF0A0E1A).withValues(alpha: _isUIVisible ? 0.95 : 0.98),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
 
-          // Content
-          SafeArea(
-            child: Column(
-              children: [
-                // Top bar
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
-                    vertical: AppSpacing.sm,
-                  ),
-                  child: Row(
-                    children: [
-                      _CircleIconButton(
-                        icon: LucideIcons.x,
-                        onTap: () {
-                          _timer?.cancel();
-                          context.pop();
-                        },
+            // Content
+            SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Top bar
+                  AnimatedOpacity(
+                    opacity: _isUIVisible ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 300),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.lg,
+                        vertical: AppSpacing.sm,
                       ),
-                      const Spacer(),
-                      if (_isStarted)
-                        Text(
-                          '$remainMin:$remainSec',
-                          style: AppTypography.mono.copyWith(
-                            color: Colors.white70,
-                            fontSize: 16,
-                            fontFeatures: [const FontFeature.tabularFigures()],
+                      child: Row(
+                        children: [
+                          _CircleIconButton(
+                            icon: LucideIcons.x,
+                            onTap: () {
+                              if (!_isUIVisible) return;
+                              _timer?.cancel();
+                              context.pop();
+                            },
                           ),
-                        ),
-                      const Spacer(),
-                      const SizedBox(width: 40),
-                    ],
-                  ),
-                ),
-
-                const Spacer(flex: 1),
-
-                if (!_isStarted) ...[
-                  // Pre-session view
-                  Icon(
-                    m.category.icon,
-                    size: 48,
-                    color: m.accentColor.withValues(alpha: 0.7),
-                  ).animate().fadeIn(duration: 600.ms).scale(
-                        begin: const Offset(0.8, 0.8),
-                        end: const Offset(1.0, 1.0),
-                        duration: 600.ms,
+                          const Spacer(),
+                          Text(
+                            'Donate',
+                            style: AppTypography.bodyMedium.copyWith(
+                              color: Colors.white70,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.lg),
+                          _CircleIconButton(
+                            icon: LucideIcons.share,
+                            onTap: () {
+                               if (!_isUIVisible) return;
+                            },
+                          ),
+                        ],
                       ),
-                  const SizedBox(height: AppSpacing.xl),
-                  Text(
-                    m.title,
-                    style: AppTypography.heading1.copyWith(
-                      color: Colors.white,
-                      fontSize: 28,
                     ),
-                    textAlign: TextAlign.center,
-                  ).animate().fadeIn(delay: 200.ms, duration: 500.ms),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    '${m.durationMinutes} minutes',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: Colors.white54,
-                    ),
-                  ).animate().fadeIn(delay: 300.ms, duration: 500.ms),
-                  const SizedBox(height: AppSpacing.xl),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxxl),
-                    child: Text(
-                      m.description,
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: Colors.white38,
-                        height: 1.6,
+                  ),
+
+                  const Spacer(),
+
+                  // Pre-session view or Active Session Breathing Circle
+                  if (!_isStarted) ...[
+                    Icon(
+                      m.category.icon,
+                      size: 48,
+                      color: m.accentColor.withValues(alpha: 0.7),
+                    ).animate().fadeIn(duration: 600.ms).scale(
+                          begin: const Offset(0.8, 0.8),
+                          end: const Offset(1.0, 1.0),
+                          duration: 600.ms,
+                        ),
+                    const SizedBox(height: AppSpacing.xl),
+                    Text(
+                      m.title,
+                      style: AppTypography.heading1.copyWith(
+                        color: Colors.white,
+                        fontSize: 28,
                       ),
                       textAlign: TextAlign.center,
-                    ),
-                  ).animate().fadeIn(delay: 400.ms, duration: 500.ms),
-                ] else ...[
-                  // Active session
-                  if (m.breathingPattern != null)
-                    BreathingCircle(
-                      pattern: m.breathingPattern!,
-                      isActive: !_isPaused,
-                      color: m.accentColor,
-                    ).animate().fadeIn(duration: 800.ms),
-
-                  const SizedBox(height: AppSpacing.xxl),
-
-                  // Step instruction
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 500),
-                    child: Padding(
-                      key: ValueKey(_currentStepIndex),
-                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                    ).animate().fadeIn(delay: 200.ms, duration: 500.ms),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      '${m.durationMinutes} minutes',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: Colors.white54,
+                      ),
+                    ).animate().fadeIn(delay: 300.ms, duration: 500.ms),
+                    const SizedBox(height: AppSpacing.xl),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxxl),
                       child: Text(
-                        currentStep.instruction,
-                        style: AppTypography.bodyLarge.copyWith(
-                          color: Colors.white.withValues(alpha: 0.85),
+                        m.description,
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: Colors.white38,
                           height: 1.6,
-                          fontSize: 18,
                         ),
                         textAlign: TextAlign.center,
                       ),
+                    ).animate().fadeIn(delay: 400.ms, duration: 500.ms),
+                  ] else ...[
+                    AnimatedOpacity(
+                      opacity: _isUIVisible ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: m.breathingPattern != null
+                          ? BreathingCircle(
+                              pattern: m.breathingPattern!,
+                              isActive: !_isPaused && _isUIVisible,
+                              color: m.accentColor,
+                            ).animate().fadeIn(duration: 800.ms)
+                          : const SizedBox.shrink(),
                     ),
-                  ),
+                  ],
 
-                  const SizedBox(height: AppSpacing.xxl),
+                  const Spacer(),
 
-                  // Step progress
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 60),
-                    child: ClipRRect(
-                      borderRadius: AppRadius.circular,
-                      child: LinearProgressIndicator(
-                        value: stepProgress.clamp(0.0, 1.0),
-                        backgroundColor: Colors.white.withValues(alpha: 0.1),
-                        valueColor: AlwaysStoppedAnimation(
-                          m.accentColor.withValues(alpha: 0.6),
-                        ),
-                        minHeight: 3,
+                  // Bottom Section
+                  if (!_isStarted)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _StartButton(
+                            color: m.accentColor,
+                            onTap: _startSession,
+                          ).animate().fadeIn(delay: 500.ms, duration: 500.ms)
+                           .slideY(begin: 0.1, end: 0, duration: 500.ms, delay: 500.ms),
+                        ],
                       ),
-                    ),
-                  ),
-                ],
-
-                const Spacer(flex: 2),
-
-                // Bottom controls
-                if (!_isStarted)
-                  _StartButton(
-                    color: m.accentColor,
-                    onTap: _startSession,
-                  ).animate().fadeIn(delay: 500.ms, duration: 500.ms)
-                      .slideY(begin: 0.1, end: 0, duration: 500.ms, delay: 500.ms)
-                else
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _CircleIconButton(
-                        icon: _isPaused ? LucideIcons.play : LucideIcons.pause,
-                        size: 64,
-                        iconSize: 28,
-                        onTap: _togglePause,
-                      ),
-                    ],
-                  ),
-
-                const SizedBox(height: AppSpacing.xxl),
-
-                // Overall progress
-                if (_isStarted)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                    child: Column(
-                      children: [
-                        ClipRRect(
-                          borderRadius: AppRadius.circular,
-                          child: LinearProgressIndicator(
-                            value: progress.clamp(0.0, 1.0),
-                            backgroundColor: Colors.white.withValues(alpha: 0.08),
-                            valueColor: AlwaysStoppedAnimation(
-                              m.accentColor.withValues(alpha: 0.4),
+                    )
+                  else
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Large Timer (Always visible or visible based on user preference - here we keep it always visible as per "only timer" request)
+                          AnimatedAlign(
+                            duration: const Duration(milliseconds: 500),
+                            alignment: _isUIVisible ? Alignment.centerLeft : Alignment.center,
+                            child: AnimatedScale(
+                              duration: const Duration(milliseconds: 500),
+                              scale: _isUIVisible ? 1.0 : 1.5,
+                              child: Text(
+                                _formatTime(_elapsedSeconds),
+                                style: AppTypography.heading1.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 48,
+                                  fontWeight: FontWeight.w300,
+                                  letterSpacing: -1,
+                                  fontFeatures: [const FontFeature.tabularFigures()],
+                                ),
+                              ),
                             ),
-                            minHeight: 2,
                           ),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          'Step ${_currentStepIndex + 1} of ${m.steps.length}',
-                          style: AppTypography.caption.copyWith(
-                            color: Colors.white30,
+                          
+                          // Hide everything else when UI is not visible
+                          AnimatedOpacity(
+                            opacity: _isUIVisible ? 1.0 : 0.0,
+                            duration: const Duration(milliseconds: 300),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: AppSpacing.md),
+                                Text(
+                                  m.title,
+                                  style: AppTypography.heading2.copyWith(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.xxs),
+                                Text(
+                                  m.category.label,
+                                  style: AppTypography.bodyMedium.copyWith(
+                                    color: Colors.white54,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.xl),
+                                
+                                // Scrubber & Progress
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: ClipRRect(
+                                        borderRadius: AppRadius.circular,
+                                        child: LinearProgressIndicator(
+                                          value: progress.clamp(0.0, 1.0),
+                                          backgroundColor: Colors.white.withValues(alpha: 0.1),
+                                          valueColor: AlwaysStoppedAnimation(
+                                            Colors.white.withValues(alpha: 0.8),
+                                          ),
+                                          minHeight: 4,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: AppSpacing.sm),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      _formatTime(_elapsedSeconds),
+                                      style: AppTypography.caption.copyWith(color: Colors.white54),
+                                    ),
+                                    Text(
+                                      '-${_formatTime(remainSec)}',
+                                      style: AppTypography.caption.copyWith(color: Colors.white54),
+                                    ),
+                                  ],
+                                ),
+                                
+                                const SizedBox(height: AppSpacing.lg),
+                                
+                                // Player Controls
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(LucideIcons.music),
+                                      color: Colors.white54,
+                                      onPressed: () {},
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(LucideIcons.rotateCcw),
+                                      color: Colors.white70,
+                                      iconSize: 28,
+                                      onPressed: () {
+                                        if (_isUIVisible) _seekTo(_elapsedSeconds - 15);
+                                      },
+                                    ),
+                                    _CircleIconButton(
+                                      icon: _isPaused ? LucideIcons.play : LucideIcons.pause,
+                                      size: 72,
+                                      iconSize: 32,
+                                      onTap: () {
+                                        if (_isUIVisible) _togglePause();
+                                      },
+                                      color: Colors.white,
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(LucideIcons.rotateCw),
+                                      color: Colors.white70,
+                                      iconSize: 28,
+                                      onPressed: () {
+                                        if (_isUIVisible) _seekTo(_elapsedSeconds + 15);
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(LucideIcons.repeat),
+                                      color: Colors.white54,
+                                      onPressed: () {},
+                                    ),
+                                  ],
+                                ),
+                                
+                                const SizedBox(height: AppSpacing.xxl),
+                                
+                                // Current step instruction ("How are you feeling?" equivalent space)
+                                Center(
+                                  child: AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 500),
+                                    child: Text(
+                                      currentStep.instruction,
+                                      key: ValueKey(_currentStepIndex),
+                                      style: AppTypography.bodyMedium.copyWith(
+                                        color: Colors.white.withValues(alpha: 0.7),
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.xl),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-
-                const SizedBox(height: AppSpacing.xl),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -340,12 +503,14 @@ class _CircleIconButton extends StatelessWidget {
     required this.onTap,
     this.size = 40,
     this.iconSize = 20,
+    this.color,
   });
 
   final IconData icon;
   final VoidCallback onTap;
   final double size;
   final double iconSize;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -356,12 +521,12 @@ class _CircleIconButton extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.white.withValues(alpha: 0.1),
+          color: (color ?? Colors.white).withValues(alpha: 0.1),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.15),
+            color: (color ?? Colors.white).withValues(alpha: 0.15),
           ),
         ),
-        child: Icon(icon, size: iconSize, color: Colors.white70),
+        child: Icon(icon, size: iconSize, color: color ?? Colors.white70),
       ),
     );
   }

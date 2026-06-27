@@ -143,19 +143,23 @@ class _BreathingCircleState extends State<BreathingCircle>
               ),
               boxShadow: [
                 BoxShadow(
-                  color: widget.color.withValues(alpha: 0.2),
-                  blurRadius: 30,
-                  spreadRadius: 5,
+                  color: widget.color.withValues(alpha: 0.2 + (0.2 * _progress)),
+                  blurRadius: 30 + (20 * _progress),
+                  spreadRadius: 5 + (10 * _progress),
                 ),
               ],
             ),
             child: Center(
-              child: Text(
-                _phaseLabel,
-                style: AppTypography.caption.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
+              child: AnimatedScale(
+                scale: 1.0 + (0.15 * _progress),
+                duration: const Duration(milliseconds: 100),
+                child: Text(
+                  _phaseLabel,
+                  style: AppTypography.caption.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
                 ),
               ),
             ),

@@ -26,7 +26,7 @@ class GreetingSection extends StatelessWidget {
     final hour = DateTime.now().hour;
     final greeting = hour < 12 ? 'Good\nmorning.' : hour < 17 ? 'Good\nafternoon.' : 'Good\nevening.';
     final now = DateTime.now();
-    final months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    final months = ['Jan','Feb','Mar','Apr','May','June','Jul','Aug','Sep','Oct','Nov','Dec'];
     final weekdays = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
     final dateLabel = '${weekdays[now.weekday - 1]}, ${months[now.month - 1]} ${now.day}';
     const streakDays = 127;
@@ -34,29 +34,19 @@ class GreetingSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.xs + 1,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.primaryXLight,
-            borderRadius: AppRadius.circular,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(LucideIcons.calendarDays, size: 11, color: AppColors.primary),
-              const SizedBox(width: AppSpacing.xs),
-              Text(
-                dateLabel,
-                style: AppTypography.label.copyWith(
-                  color: AppColors.primary,
-                  letterSpacing: 0.3,
-                ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(LucideIcons.calendarDays, size: 11, color: AppColors.primary),
+            const SizedBox(width: AppSpacing.xs),
+            Text(
+              dateLabel,
+              style: AppTypography.label.copyWith(
+                color: AppColors.primary,
+                letterSpacing: 0.3,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(

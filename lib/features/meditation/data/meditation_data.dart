@@ -41,7 +41,6 @@ final allMeditations = <Meditation>[
     description: 'A rapid grounding exercise for moments when cravings feel overwhelming. Uses box breathing and sensory anchoring to break the urge cycle.',
     isQuickStart: true,
     accentColor: const Color(0xFFEF4444),
-    breathingPattern: _boxBreathing,
     steps: const [
       MeditationStep(instruction: 'Close your eyes. You are safe right now.', durationSeconds: 8),
       MeditationStep(instruction: 'Notice the urge without judging it. It\'s just a wave — it will pass.', durationSeconds: 12),
@@ -82,7 +81,6 @@ final allMeditations = <Meditation>[
     durationMinutes: 10,
     description: 'The RAIN technique — Recognize, Allow, Investigate, Non-identification. Learn to observe cravings as temporary events that pass on their own.',
     accentColor: const Color(0xFF8B5CF6),
-    breathingPattern: _calmBreathing,
     steps: const [
       MeditationStep(instruction: 'Find a comfortable position. Close your eyes when ready.', durationSeconds: 12),
       MeditationStep(instruction: 'Take three deep breaths to center yourself.', durationSeconds: 18),
@@ -126,7 +124,6 @@ final allMeditations = <Meditation>[
     durationMinutes: 6,
     description: 'A rapid progressive relaxation paired with deep breathing. Releases physical tension that often triggers urges.',
     accentColor: const Color(0xFF10B981),
-    breathingPattern: _calmBreathing,
     steps: const [
       MeditationStep(instruction: 'Take a moment to check in. Where are you holding tension?', durationSeconds: 12),
       MeditationStep(instruction: 'Squeeze your fists tight for 5 seconds… and release.', durationSeconds: 12),
@@ -148,7 +145,6 @@ final allMeditations = <Meditation>[
     durationMinutes: 12,
     description: 'A slow, intentional scan from head to toe. Rebuilds a healthy, mindful relationship with your physical self during recovery.',
     accentColor: const Color(0xFF14B8A6),
-    breathingPattern: _calmBreathing,
     steps: const [
       MeditationStep(instruction: 'Lie down comfortably. Close your eyes. Take three deep breaths.', durationSeconds: 20),
       MeditationStep(instruction: 'Bring your attention to the top of your head. Notice any sensations.', durationSeconds: 30),
@@ -174,7 +170,6 @@ final allMeditations = <Meditation>[
     durationMinutes: 15,
     description: 'A gentle guided relaxation designed for bedtime. Helps with the insomnia and restlessness common in early recovery.',
     accentColor: const Color(0xFF6366F1),
-    breathingPattern: _breathing478,
     steps: const [
       MeditationStep(instruction: 'You\'re done for today. Everything can wait until tomorrow.', durationSeconds: 15),
       MeditationStep(instruction: 'Let your body sink into the bed. Feel the weight of your limbs.', durationSeconds: 20),
@@ -196,7 +191,6 @@ final allMeditations = <Meditation>[
     durationMinutes: 7,
     description: 'Set a clear intention for the day ahead. Build momentum with mindful energy instead of reaching for your phone.',
     accentColor: const Color(0xFFF59E0B),
-    breathingPattern: _energizingBreathing,
     steps: const [
       MeditationStep(instruction: 'Good morning. Before anything else, this moment is yours.', durationSeconds: 10),
       MeditationStep(instruction: 'Sit up. Feel your feet on the ground. You\'re here, you\'re present.', durationSeconds: 15),
@@ -220,7 +214,6 @@ final allMeditations = <Meditation>[
     durationMinutes: 10,
     description: 'A concentration meditation to combat the brain fog and scattered attention common during recovery. Rebuilds mental discipline.',
     accentColor: const Color(0xFF0EA5E9),
-    breathingPattern: _boxBreathing,
     steps: const [
       MeditationStep(instruction: 'Sit tall. Hands on your knees. Eyes gently closed.', durationSeconds: 12),
       MeditationStep(instruction: 'Follow the breathing circle to settle your mind.', durationSeconds: 60),
@@ -243,7 +236,6 @@ final allMeditations = <Meditation>[
     durationMinutes: 8,
     description: 'Gratitude rewires the brain\'s reward system — the same system that addiction hijacks. This practice builds a natural source of dopamine.',
     accentColor: const Color(0xFFEC4899),
-    breathingPattern: _calmBreathing,
     steps: const [
       MeditationStep(instruction: 'Close your eyes. Take a few calming breaths.', durationSeconds: 15),
       MeditationStep(instruction: 'Follow the breathing circle as you settle in.', durationSeconds: 60),
@@ -257,6 +249,19 @@ final allMeditations = <Meditation>[
       MeditationStep(instruction: 'Silently say: "I am grateful for my strength to keep going."', durationSeconds: 25),
       MeditationStep(instruction: 'Continue breathing. Let this gratitude be your natural high.', durationSeconds: 120),
       MeditationStep(instruction: 'Open your eyes. Carry this warmth with you today.', durationSeconds: 12),
+    ],
+  ),
+  // ── Music ────────────────────────────────────────────
+  Meditation(
+    id: 'ambient_rain',
+    title: 'Ambient Rain',
+    subtitle: 'Nature sounds for focus or sleep',
+    category: MeditationCategory.music,
+    durationMinutes: 60,
+    description: 'A continuous hour of gentle rain falling on leaves, designed to wash away distractions and create a peaceful acoustic environment.',
+    accentColor: const Color(0xFF64748B),
+    steps: const [
+      MeditationStep(instruction: 'Relax and listen.', durationSeconds: 3600),
     ],
   ),
 ];
