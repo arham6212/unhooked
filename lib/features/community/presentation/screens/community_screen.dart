@@ -53,6 +53,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                 activeFilter: _activeFilter,
                 onFilterChanged: (f) => setState(() => _activeFilter = f),
                 onSearch: () => _showSearchSheet(context),
+                onCreate: () => _showNewPostSheet(context),
               ),
               Expanded(
                 child: asyncPosts.when(
@@ -70,9 +71,6 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
             ],
           ),
         ),
-      ),
-      floatingActionButton: _GradientFab(
-        onPressed: () => _showNewPostSheet(context),
       ),
     );
   }
@@ -97,11 +95,13 @@ class _CommunityHeader extends StatelessWidget {
     required this.activeFilter,
     required this.onFilterChanged,
     required this.onSearch,
+    required this.onCreate,
   });
 
   final _FeedFilter activeFilter;
   final ValueChanged<_FeedFilter> onFilterChanged;
   final VoidCallback onSearch;
+  final VoidCallback onCreate;
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +137,12 @@ class _CommunityHeader extends StatelessWidget {
                   ],
                 ),
               ),
-              // Search icon button
+              _PillButton(
+                icon: LucideIcons.plus,
+                label: 'Post',
+                onTap: onCreate,
+              ),
+              const SizedBox(width: 10),
               _IconBtn(
                 icon: LucideIcons.search,
                 onTap: onSearch,
@@ -251,57 +256,42 @@ class _IconBtn extends StatelessWidget {
 }
 
 
-class _GradientFab extends StatefulWidget {
-  const _GradientFab({required this.onPressed});
-  final VoidCallback onPressed;
-
-  @override
-  State<_GradientFab> createState() => _GradientFabState();
-}
-
-class _GradientFabState extends State<_GradientFab> {
-  bool _pressed = false;
+class _PillButton extends StatelessWidget {
+  const _PillButton({required this.icon, required this.label, required this.onTap});
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) {
-        setState(() => _pressed = false);
-        widget.onPressed();
-      },
-      onTapCancel: () => setState(() => _pressed = false),
-      child: AnimatedScale(
-        scale: _pressed ? 0.93 : 1.0,
-        duration: const Duration(milliseconds: 130),
-        child: Container(
-          height: 52,
-          padding: const EdgeInsets.symmetric(horizontal: 22),
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(AppRadius.pill),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.40),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppColors.primary,
+          borderRadius: BorderRadius.circular(AppRadius.pill),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16, color: AppColors.onPrimary),
+            const SizedBox(width: AppSpacing.xs),
+            Text(
+              label,
+              style: AppTypography.button.copyWith(
+                color: AppColors.onPrimary,
+                fontSize: 13,
               ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(LucideIcons.plus, color: AppColors.onPrimary, size: 20),
-              const SizedBox(width: AppSpacing.sm),
-              Text(
-                'Create Post',
-                style: AppTypography.button.copyWith(
-                  color: AppColors.onPrimary,
-                  letterSpacing: 0.2,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

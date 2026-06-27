@@ -8,6 +8,19 @@ import '../../../../core/design_system/tokens/app_radius.dart';
 class GreetingSection extends StatelessWidget {
   const GreetingSection({super.key});
 
+  String _dynamicSubtitle(int streakDays) {
+    if (streakDays >= 365) return 'Over a year strong. You\'re rewriting your story.';
+    if (streakDays >= 180) return '6 months deep — this is who you are now.';
+    if (streakDays >= 120) return 'You\'ve passed 4 months. Remarkable.';
+    if (streakDays >= 90) return '90 days — a true milestone. Keep going.';
+    if (streakDays >= 60) return '2 months in. The compound effect is real.';
+    if (streakDays >= 30) return 'One full month. You\'re building something.';
+    if (streakDays >= 14) return 'Two weeks strong — momentum is yours.';
+    if (streakDays >= 7) return 'A full week. Each day adds up.';
+    if (streakDays >= 3) return 'Three days and counting. Stay with it.';
+    return 'Every hour matters. You\'re doing this.';
+  }
+
   @override
   Widget build(BuildContext context) {
     final hour = DateTime.now().hour;
@@ -16,11 +29,11 @@ class GreetingSection extends StatelessWidget {
     final months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     final weekdays = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
     final dateLabel = '${weekdays[now.weekday - 1]}, ${months[now.month - 1]} ${now.day}';
+    const streakDays = 127;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Date chip
         Container(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.md,
@@ -45,10 +58,7 @@ class GreetingSection extends StatelessWidget {
             ],
           ),
         ),
-
         const SizedBox(height: AppSpacing.sm),
-
-        // Large greeting
         Text(
           greeting,
           style: AppTypography.heading1.copyWith(
@@ -59,11 +69,9 @@ class GreetingSection extends StatelessWidget {
             color: AppColors.textPrimary,
           ),
         ),
-
         const SizedBox(height: AppSpacing.sm),
-
         Text(
-          'Your streak is growing — keep it up.',
+          _dynamicSubtitle(streakDays),
           style: AppTypography.bodyMedium.copyWith(
             color: AppColors.textMuted,
             fontSize: 14,

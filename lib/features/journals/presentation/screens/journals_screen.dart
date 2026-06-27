@@ -121,12 +121,6 @@ class _JournalScreenState extends State<JournalScreen> {
           ],
         ),
       ),
-      floatingActionButton: _entries.isEmpty
-          ? null
-          : Padding(
-              padding: const EdgeInsets.only(bottom: 80), // Push above global BottomNavBar
-              child: _WriteFab(onPressed: _openCompose),
-            ),
     );
   }
 }
@@ -169,8 +163,9 @@ class _JournalHeader extends StatelessWidget {
               ],
             ),
           ),
-          _CircleBtn(
-            icon: LucideIcons.pencil,
+          _PillButton(
+            icon: LucideIcons.plus,
+            label: 'Write',
             onTap: onCompose,
           ),
         ],
@@ -179,32 +174,43 @@ class _JournalHeader extends StatelessWidget {
   }
 }
 
-class _CircleBtn extends StatelessWidget {
-  const _CircleBtn({required this.icon, required this.onTap});
+class _PillButton extends StatelessWidget {
+  const _PillButton({required this.icon, required this.label, required this.onTap});
   final IconData icon;
+  final String label;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 40,
-        height: 40,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
-          shape: BoxShape.circle,
+          color: AppColors.primary,
+          borderRadius: AppRadius.circular,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.07),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: AppColors.primary.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: Icon(icon, size: 18, color: AppColors.textPrimary),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16, color: AppColors.onPrimary),
+            const SizedBox(width: AppSpacing.xs),
+            Text(
+              label,
+              style: AppTypography.button.copyWith(
+                color: AppColors.onPrimary,
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -426,60 +432,6 @@ class _EntryCard extends StatelessWidget {
   }
 }
 
-// ── Write FAB ────────────────────────────────────────────────
-class _WriteFab extends StatefulWidget {
-  const _WriteFab({required this.onPressed});
-  final VoidCallback onPressed;
-
-  @override
-  State<_WriteFab> createState() => _WriteFabState();
-}
-
-class _WriteFabState extends State<_WriteFab> {
-  bool _pressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) {
-        setState(() => _pressed = false);
-        widget.onPressed();
-      },
-      onTapCancel: () => setState(() => _pressed = false),
-      child: AnimatedScale(
-        scale: _pressed ? 0.93 : 1.0,
-        duration: const Duration(milliseconds: 130),
-        child: Container(
-          height: 52,
-          padding: const EdgeInsets.symmetric(horizontal: 22),
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: AppRadius.circular,
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.40),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(LucideIcons.pencil, color: AppColors.onPrimary, size: 18),
-              const SizedBox(width: AppSpacing.sm),
-              Text(
-                'Write',
-                style: AppTypography.button.copyWith(color: AppColors.onPrimary),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 // ── Compose Sheet ─────────────────────────────────────────────
 class _ComposeSheet extends StatefulWidget {

@@ -12,7 +12,9 @@ import '../../../community/presentation/screens/post_details_page.dart';
 import '../../../community/presentation/screens/create_post_screen.dart';
 import '../../../community/domain/entities/post.dart';
 import '../../../journals/presentation/screens/journals_screen.dart';
-import '../../../relapse_history/presentation/screens/relapse_history_screen.dart';
+import '../../../meditation/presentation/screens/meditation_screen.dart';
+import '../../../meditation/presentation/screens/meditation_session_screen.dart';
+import '../../../meditation/presentation/screens/session_complete_screen.dart';
 import '../../../settings/presentation/screens/settings_screen.dart';
 
 import '../../../home/presentation/screens/home_screen_body.dart';
@@ -124,6 +126,36 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
 
+          // 🧘 MEDITATE
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/meditate',
+                builder: (context, state) => const MeditationScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'session/:id',
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      return MeditationSessionScreen(meditationId: id);
+                    },
+                  ),
+                  GoRoute(
+                    path: 'complete',
+                    builder: (context, state) {
+                      final extra = state.extra as Map<String, dynamic>;
+                      return SessionCompleteScreen(
+                        title: extra['title'] as String,
+                        durationSeconds: extra['duration'] as int,
+                        color: extra['color'] as Color,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+
           // 👥 COMMUNITY
           StatefulShellBranch(
             routes: [
@@ -144,16 +176,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                     },
                   ),
                 ],
-              ),
-            ],
-          ),
-
-          // 🕘 HISTORY
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/history',
-                builder: (context, state) => const HistoryScreen(),
               ),
             ],
           ),

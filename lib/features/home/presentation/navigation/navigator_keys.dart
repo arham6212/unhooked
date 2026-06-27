@@ -6,6 +6,6 @@ final navigatorKeys = {
   BottomTab.home: GlobalKey<NavigatorState>(),
   BottomTab.journal: GlobalKey<NavigatorState>(),
   BottomTab.community: GlobalKey<NavigatorState>(),
-  BottomTab.history: GlobalKey<NavigatorState>(),
+  BottomTab.meditate: GlobalKey<NavigatorState>(),
   BottomTab.profile: GlobalKey<NavigatorState>(),
 };

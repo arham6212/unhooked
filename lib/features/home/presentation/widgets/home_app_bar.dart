@@ -14,7 +14,17 @@ class HomeAppBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Icon(LucideIcons.userCircle2, color: AppColors.primaryDark),
+          CircleAvatar(
+            radius: 18,
+            backgroundColor: AppColors.primaryXLight,
+            child: Text(
+              'A',
+              style: AppTypography.button.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
           Text(
             'INNER MONK',
             style: AppTypography.heading3.copyWith(
