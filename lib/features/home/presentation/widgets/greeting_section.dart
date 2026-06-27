@@ -3,7 +3,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/design_system/tokens/app_colors.dart';
 import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
-import '../../../../core/design_system/tokens/app_radius.dart';
 
 class GreetingSection extends StatelessWidget {
   const GreetingSection({super.key});

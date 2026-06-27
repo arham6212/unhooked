@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
 import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_radius.dart';
@@ -24,6 +25,8 @@ class SessionCompleteScreen extends StatefulWidget {
 }
 
 class _SessionCompleteScreenState extends State<SessionCompleteScreen> {
+  int? _selectedMood;
+
   @override
   void initState() {
     super.initState();
@@ -148,6 +151,44 @@ class _SessionCompleteScreenState extends State<SessionCompleteScreen> {
 
                   const SizedBox(height: AppSpacing.xxl),
 
+                  // Feedback Section
+                  Text(
+                    'How are you feeling?',
+                    style: AppTypography.bodyMedium.copyWith(color: Colors.white70),
+                  ).animate().fadeIn(delay: 700.ms, duration: 500.ms),
+                  const SizedBox(height: AppSpacing.sm),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(5, (index) {
+                      final isSelected = _selectedMood == index;
+                      return GestureDetector(
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          setState(() => _selectedMood = index);
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          margin: const EdgeInsets.symmetric(horizontal: 6),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isSelected ? widget.color.withValues(alpha: 0.2) : Colors.transparent,
+                            border: Border.all(
+                              color: isSelected ? widget.color : Colors.transparent,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Text(
+                            ['😞', '🙁', '😐', '🙂', '🤩'][index],
+                            style: TextStyle(fontSize: isSelected ? 28 : 24),
+                          ),
+                        ),
+                      ).animate().fadeIn(delay: (700 + index * 100).ms, duration: 400.ms);
+                    }),
+                  ),
+
+                  const SizedBox(height: AppSpacing.xxl),
+
                   Text(
                     '"The mind is everything.\nWhat you think, you become."',
                     style: AppTypography.bodyMedium.copyWith(
@@ -156,7 +197,7 @@ class _SessionCompleteScreenState extends State<SessionCompleteScreen> {
                       height: 1.6,
                     ),
                     textAlign: TextAlign.center,
-                  ).animate().fadeIn(delay: 700.ms, duration: 600.ms),
+                  ).animate().fadeIn(delay: 1000.ms, duration: 600.ms),
 
                   const SizedBox(height: AppSpacing.xs),
 
@@ -165,7 +206,7 @@ class _SessionCompleteScreenState extends State<SessionCompleteScreen> {
                     style: AppTypography.caption.copyWith(
                       color: Colors.white24,
                     ),
-                  ).animate().fadeIn(delay: 900.ms, duration: 500.ms),
+                  ).animate().fadeIn(delay: 1200.ms, duration: 500.ms),
 
                   const Spacer(flex: 2),
 
@@ -198,10 +239,44 @@ class _SessionCompleteScreenState extends State<SessionCompleteScreen> {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                  ).animate().fadeIn(delay: 1000.ms, duration: 500.ms)
-                      .slideY(begin: 0.1, end: 0, duration: 500.ms, delay: 1000.ms),
+                  ).animate().fadeIn(delay: 1300.ms, duration: 500.ms)
+                      .slideY(begin: 0.1, end: 0, duration: 500.ms, delay: 1300.ms),
 
-                  const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: AppSpacing.md),
+
+                  // Share button
+                  GestureDetector(
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      Share.share('I just completed a $timeStr meditation on Inner Monk! 🧘‍♂️');
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: AppRadius.large,
+                        border: Border.all(color: Colors.white24),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(LucideIcons.share, size: 18, color: Colors.white),
+                          const SizedBox(width: AppSpacing.sm),
+                          Text(
+                            'Share Milestone',
+                            style: AppTypography.button.copyWith(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ).animate().fadeIn(delay: 1400.ms, duration: 500.ms)
+                      .slideY(begin: 0.1, end: 0, duration: 500.ms, delay: 1400.ms),
+
+                  const SizedBox(height: AppSpacing.xl),
                 ],
               ),
             ),

@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
 import '../../../../core/design_system/tokens/app_spacing.dart';
@@ -33,6 +35,7 @@ class _MeditationSessionScreenState
   bool _isStarted = false;
   bool _isUIVisible = true;
   Meditation? _meditation;
+  late final AudioPlayer _audioPlayer;
 
   int get _totalDurationSeconds =>
       _meditation?.steps.fold(0, (sum, s) => sum! + s.durationSeconds) ?? 0;
@@ -40,6 +43,17 @@ class _MeditationSessionScreenState
   @override
   void initState() {
     super.initState();
+    _audioPlayer = AudioPlayer();
+    
+    _audioPlayer.playerStateStream.listen((state) {
+      if (!mounted) return;
+      if (state.playing && _isPaused) {
+        setState(() => _isPaused = false);
+      } else if (!state.playing && !_isPaused) {
+        setState(() => _isPaused = true);
+      }
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final meditations = ref.read(meditationsProvider);
       final m = meditations.firstWhere((m) => m.id == widget.meditationId);
@@ -47,10 +61,28 @@ class _MeditationSessionScreenState
     });
   }
 
-  void _startSession() {
+  void _startSession() async {
     setState(() => _isStarted = true);
     HapticFeedback.mediumImpact();
     _resetUiTimer();
+    
+    if (_meditation?.audioUrl != null) {
+      try {
+        final mediaItem = MediaItem(
+          id: _meditation!.id,
+          album: 'Inner Monk',
+          title: _meditation!.title,
+          artist: _meditation!.category.label,
+        );
+        await _audioPlayer.setAudioSource(
+          AudioSource.uri(Uri.parse(_meditation!.audioUrl!), tag: mediaItem),
+        );
+        await _audioPlayer.setLoopMode(LoopMode.one);
+        await _audioPlayer.play();
+      } catch (e) {
+        debugPrint('Error loading audio: $e');
+      }
+    }
     
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (_isPaused || _meditation == null) return;
@@ -75,6 +107,13 @@ class _MeditationSessionScreenState
 
   void _togglePause() {
     HapticFeedback.lightImpact();
+    
+    if (_isPaused) {
+      _audioPlayer.play();
+    } else {
+      _audioPlayer.pause();
+    }
+    
     setState(() => _isPaused = !_isPaused);
     _resetUiTimer();
   }
@@ -137,6 +176,7 @@ class _MeditationSessionScreenState
   void _completeSession() {
     _timer?.cancel();
     _uiTimer?.cancel();
+    _audioPlayer.stop();
     HapticFeedback.heavyImpact();
 
     ref.read(meditationStatsProvider.notifier).addSession(
@@ -153,10 +193,117 @@ class _MeditationSessionScreenState
     );
   }
 
+  void _handleExitAttempt() {
+    if (!_isStarted || _elapsedSeconds == 0) {
+      _timer?.cancel();
+      _audioPlayer.stop();
+      context.pop();
+      return;
+    }
+    
+    final wasPaused = _isPaused;
+    if (!wasPaused) {
+      setState(() => _isPaused = true);
+    }
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E293B).withValues(alpha: 0.95),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'End Session?',
+                style: AppTypography.heading2.copyWith(color: Colors.white),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'You have meditated for ${_formatTime(_elapsedSeconds)}. Would you like to log this time?',
+                style: AppTypography.bodyMedium.copyWith(color: Colors.white70),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              GestureDetector(
+                onTap: () {
+                  context.pop(); // close sheet
+                  _completeSession(); // log and go to complete screen
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    color: _meditation!.accentColor,
+                    borderRadius: AppRadius.circular,
+                  ),
+                  child: Text(
+                    'Log Session',
+                    style: AppTypography.button.copyWith(color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              GestureDetector(
+                onTap: () {
+                  context.pop(); // close sheet
+                  _timer?.cancel();
+                  _audioPlayer.stop();
+                  context.pop(); // exit screen
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    borderRadius: AppRadius.circular,
+                    border: Border.all(color: Colors.white24),
+                  ),
+                  child: Text(
+                    'Discard',
+                    style: AppTypography.button.copyWith(color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              GestureDetector(
+                onTap: () {
+                  context.pop(); // close sheet
+                  if (!wasPaused) {
+                    setState(() => _isPaused = false);
+                  }
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  color: Colors.transparent,
+                  child: Text(
+                    'Resume',
+                    style: AppTypography.button.copyWith(color: Colors.white54),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
     _uiTimer?.cancel();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -181,8 +328,14 @@ class _MeditationSessionScreenState
     final remainSec = totalSec - _elapsedSeconds;
     final currentStep = m.steps[_currentStepIndex];
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF0A0E1A),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleExitAttempt();
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFF0A0E1A),
       body: GestureDetector(
         onTap: _toggleUI,
         behavior: HitTestBehavior.opaque,
@@ -241,8 +394,7 @@ class _MeditationSessionScreenState
                             icon: LucideIcons.x,
                             onTap: () {
                               if (!_isUIVisible) return;
-                              _timer?.cancel();
-                              context.pop();
+                              _handleExitAttempt();
                             },
                           ),
                           const Spacer(),
@@ -493,9 +645,10 @@ class _MeditationSessionScreenState
           ],
         ),
       ),
-    );
+    ));
   }
 }
+
 
 class _CircleIconButton extends StatelessWidget {
   const _CircleIconButton({

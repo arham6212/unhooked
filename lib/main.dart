@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 
 import 'core/config/app_config.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
@@ -9,6 +10,12 @@ import 'core/design_system/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.arham.recover_me.channel.audio',
+    androidNotificationChannelName: 'Audio playback',
+    androidNotificationOngoing: true,
+  );
 
   await Supabase.initialize(
     url: AppConfig.supabaseUrl,

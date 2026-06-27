@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
+enum MeditationType {
+  guided,
+  exercise,
+  soundscape,
+}
+
 enum MeditationCategory {
   all('All', LucideIcons.layoutGrid),
   urgeSurfing('Urge Surfing', LucideIcons.waves),
-  breathing('Breathing', LucideIcons.wind),
   bodyScan('Body Scan', LucideIcons.scan),
   sleep('Sleep', LucideIcons.moon),
   morning('Morning', LucideIcons.sunrise),
   focus('Focus', LucideIcons.target),
-  gratitude('Gratitude', LucideIcons.heart),
-  music('Music', LucideIcons.music);
+  gratitude('Gratitude', LucideIcons.heart);
 
   final String label;
   final IconData icon;
@@ -50,6 +54,7 @@ class Meditation {
   final String id;
   final String title;
   final String subtitle;
+  final MeditationType type;
   final MeditationCategory category;
   final int durationMinutes;
   final String description;
@@ -57,11 +62,13 @@ class Meditation {
   final BreathingPattern? breathingPattern;
   final bool isQuickStart;
   final Color accentColor;
+  final String? audioUrl;
 
   const Meditation({
     required this.id,
     required this.title,
     required this.subtitle,
+    required this.type,
     required this.category,
     required this.durationMinutes,
     required this.description,
@@ -69,5 +76,6 @@ class Meditation {
     this.breathingPattern,
     this.isQuickStart = false,
     this.accentColor = const Color(0xFF2563FF),
+    this.audioUrl,
   });
 }
