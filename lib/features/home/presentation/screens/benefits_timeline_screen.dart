@@ -24,14 +24,14 @@ class RecoveryBenefit {
   final Color color;
 }
 
-const List<RecoveryBenefit> _kBenefits = [
+final List<RecoveryBenefit> _kBenefits = [
   RecoveryBenefit(
     days: 0,
     timeLabel: 'Day 0',
     title: 'You started',
     description: 'The moment you chose recovery. Every benefit from here builds on this.',
     icon: LucideIcons.flag,
-    color: Color(0xFF2563FF),
+    color: AppColors.primary,
   ),
   RecoveryBenefit(
     days: 1,
@@ -47,7 +47,7 @@ const List<RecoveryBenefit> _kBenefits = [
     title: 'Detox in motion',
     description: 'Acute withdrawal often peaks and starts to ease. Sleep may still be rough.',
     icon: LucideIcons.shieldCheck,
-    color: Color(0xFF10B981),
+    color: AppColors.avatarPalette[2],
   ),
   RecoveryBenefit(
     days: 7,
@@ -55,7 +55,7 @@ const List<RecoveryBenefit> _kBenefits = [
     title: 'Sleep & mood shift',
     description: 'Many notice better sleep and more stable mood. Cravings can still spike.',
     icon: LucideIcons.moon,
-    color: Color(0xFF8B5CF6),
+    color: AppColors.avatarPalette[1],
   ),
   RecoveryBenefit(
     days: 14,
@@ -63,7 +63,7 @@ const List<RecoveryBenefit> _kBenefits = [
     title: 'Energy & focus',
     description: 'Mental clarity and energy improve. Routine starts to feel possible.',
     icon: LucideIcons.brain,
-    color: Color(0xFF06B6D4),
+    color: AppColors.avatarPalette[5],
   ),
   RecoveryBenefit(
     days: 30,
@@ -71,7 +71,7 @@ const List<RecoveryBenefit> _kBenefits = [
     title: 'Stronger foundation',
     description: 'Physical and mental gains become clearer. New habits take root.',
     icon: LucideIcons.leaf,
-    color: Color(0xFF10B981),
+    color: AppColors.avatarPalette[2],
   ),
   RecoveryBenefit(
     days: 90,
@@ -79,7 +79,7 @@ const List<RecoveryBenefit> _kBenefits = [
     title: 'Brain rewiring',
     description: 'Neural pathways shift. Cravings reduce; sober identity feels natural.',
     icon: LucideIcons.brainCircuit,
-    color: Color(0xFF2563FF),
+    color: AppColors.primary,
   ),
   RecoveryBenefit(
     days: 180,
@@ -87,7 +87,7 @@ const List<RecoveryBenefit> _kBenefits = [
     title: 'New identity',
     description: 'You\'re not "quitting" — you\'re someone who lives without it.',
     icon: LucideIcons.user,
-    color: Color(0xFFEC4899),
+    color: AppColors.avatarPalette[4],
   ),
   RecoveryBenefit(
     days: 365,
@@ -103,7 +103,7 @@ const List<RecoveryBenefit> _kBenefits = [
     title: 'Deep stability',
     description: 'Recovery is part of who you are. Keep your practices and community.',
     icon: LucideIcons.anchor,
-    color: Color(0xFF2563FF),
+    color: AppColors.primary,
   ),
 ];
 
@@ -447,7 +447,7 @@ class _TimelineRow extends StatelessWidget {
                   achieved ? LucideIcons.check : benefit.icon,
                   size: 16,
                   color: achieved
-                      ? Colors.white
+                      ? AppColors.onPrimary
                       : isNext
                           ? AppColors.primary
                           : AppColors.textMuted,
@@ -537,7 +537,7 @@ class _MilestoneCard extends StatelessWidget {
               offset: const Offset(0, 4),
             ),
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.025),
+            color: AppColors.textPrimary.withValues(alpha: 0.025),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),

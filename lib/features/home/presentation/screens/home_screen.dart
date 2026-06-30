@@ -21,7 +21,7 @@ class NavigationShell extends StatelessWidget {
     final selectedTab = BottomTab.values[shell.currentIndex];
 
     return Scaffold(
-      extendBody: true,
+      extendBody: false,
       body: shell,
       bottomNavigationBar: BottomNavBar(
         selectedTab: selectedTab,

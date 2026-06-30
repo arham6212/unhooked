@@ -68,7 +68,7 @@ class SettingsScreen extends ConsumerWidget {
               children: [
                 _SettingsTile(
                   icon: LucideIcons.info,
-                  label: 'About Recover Me',
+                  label: 'About Inner Monk',
                   onTap: () {},
                 ),
                 _SettingsTile(

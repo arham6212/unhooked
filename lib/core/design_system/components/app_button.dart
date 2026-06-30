@@ -4,7 +4,7 @@ import '../tokens/app_radius.dart';
 import '../tokens/app_spacing.dart';
 import '../tokens/app_typography.dart';
 
-enum AppButtonVariant { primary, secondary, text, gradient }
+enum AppButtonVariant { primary, secondary, text, gradient, error }
 
 class AppButton extends StatefulWidget {
   final String text;
@@ -84,9 +84,10 @@ class _AppButtonState extends State<AppButton> with SingleTickerProviderStateMix
 
     final isPrimary = widget.variant == AppButtonVariant.primary;
     final isText = widget.variant == AppButtonVariant.text;
+    final isError = widget.variant == AppButtonVariant.error;
 
-    final bgColor = isPrimary ? AppColors.primary : (isText ? Colors.transparent : AppColors.backgroundLight);
-    final fgColor = isPrimary ? AppColors.onPrimary : AppColors.textPrimary;
+    final bgColor = isError ? AppColors.error : (isPrimary ? AppColors.primary : (isText ? Colors.transparent : AppColors.backgroundLight));
+    final fgColor = isError ? Colors.white : (isPrimary ? AppColors.onPrimary : AppColors.textPrimary);
 
     Widget button = FilledButton(
       onPressed: widget.isLoading ? null : widget.onPressed,

@@ -118,7 +118,7 @@ class MeditationScreen extends ConsumerWidget {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               itemCount: quickStart.length,
-              separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.md),
+              separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.md),
               itemBuilder: (context, index) {
                 return QuickStartCard(
                   meditation: quickStart[index],
@@ -140,7 +140,7 @@ class MeditationScreen extends ConsumerWidget {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               itemCount: MeditationCategory.values.length,
-              separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
+              separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
               itemBuilder: (context, index) {
                 final cat = MeditationCategory.values[index];
                 final isActive = cat == selectedCategory;
@@ -161,7 +161,7 @@ class MeditationScreen extends ConsumerWidget {
             physics: const NeverScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
             itemCount: filtered.length,
-            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
+            separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
             itemBuilder: (context, index) {
               final m = filtered[index];
               return MeditationCard(
@@ -172,7 +172,7 @@ class MeditationScreen extends ConsumerWidget {
                   .slideY(begin: 0.03, end: 0, duration: 350.ms);
             },
           ),
-          const SizedBox(height: 120),
+          const SizedBox(height: AppSpacing.lg),
         ],
       ),
     );
@@ -185,9 +185,9 @@ class MeditationScreen extends ConsumerWidget {
 
     return ListView.separated(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, top: AppSpacing.md, bottom: 120),
+      padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, top: AppSpacing.md, bottom: AppSpacing.lg),
       itemCount: exercisesList.length,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
+      separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
       itemBuilder: (context, index) {
         final m = exercisesList[index];
         return MeditationCard(
@@ -207,9 +207,9 @@ class MeditationScreen extends ConsumerWidget {
 
     return ListView.separated(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, top: AppSpacing.md, bottom: 120),
+      padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, top: AppSpacing.md, bottom: AppSpacing.lg),
       itemCount: musicList.length,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
+      separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
       itemBuilder: (context, index) {
         final m = musicList[index];
         return MeditationCard(

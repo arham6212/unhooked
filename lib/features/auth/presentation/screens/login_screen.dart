@@ -86,7 +86,7 @@ class LoginScreen extends ConsumerWidget {
                   
                   // Typography
                   Text(
-                    'Recover Me',
+                    'Inner Monk',
                     textAlign: TextAlign.center,
                     style: AppTypography.display.copyWith(fontSize: 44, height: 1.1),
                   ).animate().slideY(begin: 0.2, end: 0, duration: 500.ms, curve: Curves.easeOutCubic).fadeIn(delay: 100.ms),
