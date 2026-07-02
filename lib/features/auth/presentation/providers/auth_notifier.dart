@@ -5,17 +5,8 @@ import 'auth_state.dart';
 class AuthNotifier extends Notifier<AuthState> {
   @override
   AuthState build() {
-    return const AuthState(
-      hasCompletedOnboarding: false,
-      isLoggedIn: false,
-    );
+    return const AuthState(isLoggedIn: false);
   }
-
-  void completeOnboarding() {
-    state = state.copyWith(hasCompletedOnboarding: true);
-  }
-
-
 
   Future<void> signInWithGoogle() async {
     state = state.copyWith(isLoading: true, error: null);

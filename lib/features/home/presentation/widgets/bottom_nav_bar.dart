@@ -5,6 +5,7 @@ import '../models/bottom_tab.dart';
 import '../../../../core/design_system/tokens/app_colors.dart';
 import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
+import '../../../../core/design_system/tokens/app_radius.dart';
 
 class BottomNavBar extends StatelessWidget {
   const BottomNavBar({
@@ -20,18 +21,19 @@ class BottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: Border(
-          top: BorderSide(
-            color: AppColors.border,
-            width: 0.5,
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.textPrimary.withValues(alpha: 0.03),
+            blurRadius: 16,
+            offset: const Offset(0, -2),
           ),
-        ),
+        ],
       ),
       child: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: BottomTab.values.map((tab) {
@@ -65,40 +67,35 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? AppColors.primary : AppColors.textMuted;
-
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
-        width: 64,
+        width: 60,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (selected)
-              Container(
-                width: 24,
-                height: 2,
-                margin: const EdgeInsets.only(bottom: AppSpacing.xs),
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(1),
-                ),
-              )
-            else
-              const SizedBox(height: 6),
-            Icon(
-              tab.icon,
-              color: color,
-              size: 22,
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              decoration: BoxDecoration(
+                color: selected ? AppColors.primaryXLight : Colors.transparent,
+                borderRadius: AppRadius.circular,
+              ),
+              child: Icon(
+                tab.icon,
+                color: selected ? AppColors.primary : AppColors.textSubtle,
+                size: 21,
+              ),
             ),
-            const SizedBox(height: 3),
+            const SizedBox(height: 2),
             Text(
               tab.label,
               style: AppTypography.caption.copyWith(
                 fontSize: 10,
                 fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                color: color,
+                color: selected ? AppColors.primary : AppColors.textSubtle,
               ),
             ),
           ],

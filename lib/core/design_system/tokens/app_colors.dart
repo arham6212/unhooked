@@ -62,12 +62,33 @@ class AppColors {
   // ── Semantic ──────────────────────────────────────────────────
   static const Color error   = Color(0xFFEF4444); // red — danger/relapse
   static const Color success = Color(0xFF22C55E); // green — clean days
+
+  // ── Muted semantic (heatmap / subtle indicators) ─────────────
+  static const Color successMuted = Color(0xFF86EFAC); // soft sage green
+  static const Color errorMuted   = Color(0xFFFCA5A5); // soft rose
+
+  // ── Quick-action card tints ──────────────────────────────────
+  static const Color tintBlue   = Color(0xFFEEF2FF); // reflect
+  static const Color tintPurple = Color(0xFFF3EEFF); // connect
+  static const Color tintGreen  = Color(0xFFECFDF5); // improve
+
+  // ── Warm accent (Daily Insight) ──────────────────────────────
+  static const Color warmCream  = Color(0xFFFFFBF5);
+  static const Color warmAmber  = Color(0xFFD97706);
   static const Color warning = Color(0xFFFFC107); // amber — mild alert
   static const Color info    = Color(0xFF3B82F6); // blue — informational
 
   // ── Calendar / streak grid ────────────────────────────────────
   static const Color cleanDay    = Color(0xFFFFFFFF);
   static const Color relapsedDay = Color(0xFFFCA5A5); // soft red, not harsh
+
+  // ── Intro / onboarding (First Light) ─────────────────────────
+  // The intro is the only dark surface in the app: near-black ink,
+  // warm ember light, parchment text. Blue is reserved for the
+  // sunrise hand-off into the main app.
+  static const Color introInk   = Color(0xFF07090F); // cinematic near-black
+  static const Color introEmber = Color(0xFFD8A656); // warm breathing light
+  static const Color introText  = Color(0xFFEDE9E1); // warm off-white
 
   // ── Avatar palette ────────────────────────────────────────────
   // Desaturated, harmonious — works on white cards without clashing.

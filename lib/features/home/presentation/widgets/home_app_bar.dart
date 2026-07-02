@@ -15,7 +15,7 @@ class HomeAppBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Icon(LucideIcons.menu, color: AppColors.textPrimary, size: 24),
+          const Icon(LucideIcons.menu, color: AppColors.textPrimary, size: 20),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -23,13 +23,15 @@ class HomeAppBar extends StatelessWidget {
                 'Inner Monk',
                 style: AppTypography.heading3.copyWith(
                   color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 18,
+                  letterSpacing: -0.3,
                 ),
               ),
-              const SizedBox(width: AppSpacing.xs),
+              const SizedBox(width: 6),
               Container(
-                width: 8,
-                height: 8,
+                width: 6,
+                height: 6,
                 decoration: const BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
@@ -37,29 +39,21 @@ class HomeAppBar extends StatelessWidget {
               ),
             ],
           ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: AppRadius.small,
-                ),
-                child: Row(
-                  children: [
-                    const Icon(LucideIcons.bell, size: 14, color: AppColors.onPrimary),
-                    const SizedBox(width: 4),
-                    Text(
-                      'SOS',
-                      style: AppTypography.button.copyWith(color: AppColors.onPrimary, fontSize: 12),
-                    ),
-                  ],
-                ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 5),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: AppRadius.small,
+            ),
+            child: Text(
+              'SOS',
+              style: AppTypography.button.copyWith(
+                color: AppColors.onPrimary,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
               ),
-              const SizedBox(width: AppSpacing.md),
-              const Icon(LucideIcons.moreVertical, color: AppColors.textPrimary),
-            ],
+            ),
           ),
         ],
       ),

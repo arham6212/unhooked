@@ -16,9 +16,9 @@ class RelapseHeatmap extends StatelessWidget {
       return DayStatus.success;
     });
 
-    const double dotSize = 11.0;
-    const double spacing = 6.0;
-    const int columns = 8;
+    const double dotSize = 14.0;
+    const double spacing = 8.0;
+    const int columns = 7;
     const double gridWidth = columns * dotSize + (columns - 1) * spacing;
 
     return SizedBox(
@@ -32,7 +32,7 @@ class RelapseHeatmap extends StatelessWidget {
             width: dotSize,
             height: dotSize,
             decoration: BoxDecoration(
-              color: isRelapse ? AppColors.error : AppColors.success,
+              color: isRelapse ? AppColors.errorMuted : AppColors.successMuted,
               shape: BoxShape.circle,
             ),
           );

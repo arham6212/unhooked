@@ -1,52 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_radius.dart';
 import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
-import '../../../../core/design_system/tokens/app_radius.dart';
-import '../../../../core/design_system/components/app_button.dart';
 import '../providers/posts_provider.dart';
+import '../styles/community_palette.dart';
+import '../utils/community_identity.dart';
+import '../utils/community_topics.dart';
+import '../widgets/avatar_widget.dart';
 
-// ─────────────────────────────────────────────────────────────
-//  Tag model
-// ─────────────────────────────────────────────────────────────
-class _Tag {
-  final String label;
-  final Color bgColor;
-  final Color textColor;
-  const _Tag(this.label, this.bgColor, this.textColor);
-}
-
-const _tags = <_Tag>[
-  _Tag('Motivation', AppColors.primaryLight, AppColors.primaryDark),
-  _Tag('Struggling', AppColors.error, AppColors.surface),
-  _Tag('Winning',    AppColors.success, AppColors.surface),
-  _Tag('Relapse',    AppColors.error, AppColors.surface),
-  _Tag('Question',   AppColors.primaryLight, AppColors.primaryDark),
-  _Tag('Milestone',  AppColors.primaryLight, AppColors.primaryDark),
-];
-
-// ─────────────────────────────────────────────────────────────
-//  Mood model
-// ─────────────────────────────────────────────────────────────
-class _Mood {
-  final String emoji;
-  final String label;
-  const _Mood(this.emoji, this.label);
-}
-
-const _moods = <_Mood>[
-  _Mood('😔', 'Struggling'),
-  _Mood('😐', 'Neutral'),
-  _Mood('😊', 'Good'),
-  _Mood('😄', 'Great'),
-];
-
-// ─────────────────────────────────────────────────────────────
-//  Full-Screen Create Post Screen
-// ─────────────────────────────────────────────────────────────
 class CreatePostScreen extends ConsumerStatefulWidget {
   const CreatePostScreen({super.key});
 
@@ -58,8 +25,17 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   final _titleController = TextEditingController();
   final _bodyController = TextEditingController();
   bool _submitting = false;
-  _Tag? _selectedTag;
-  _Mood? _selectedMood;
+  bool _canPost = false;
+  CommunityTopic? _topic;
+
+  @override
+  void initState() {
+    super.initState();
+    _bodyController.addListener(() {
+      final can = _bodyController.text.trim().isNotEmpty;
+      if (can != _canPost) setState(() => _canPost = can);
+    });
+  }
 
   @override
   void dispose() {
@@ -70,7 +46,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
   Future<void> _submit() async {
     final body = _bodyController.text.trim();
-    if (body.isEmpty) return;
+    if (body.isEmpty || _submitting) return;
 
     setState(() => _submitting = true);
     try {
@@ -84,7 +60,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text('Couldn\'t share your post: $e'),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: AppRadius.medium),
@@ -98,181 +74,318 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Determine if the body is empty to disable the post button
-    final isBodyEmpty = _bodyController.text.trim().isEmpty;
+    final palette = CommunityPalette.of(context);
+    final myId = ref.watch(supabaseClientProvider).auth.currentUser?.id ?? 'me';
+    final identity = CommunityIdentity.fromUserId(myId);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: palette.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        scrolledUnderElevation: 0,
+        backgroundColor: palette.surface,
         elevation: 0,
-        leadingWidth: 100,
-        leading: Center(
-          child: AppButton(
-            text: 'Cancel',
-            fullWidth: true
-            ,
-            variant: AppButtonVariant.text,
-            onPressed: () => _submitting ? null : context.pop(),
-          ),
+        scrolledUnderElevation: 0,
+        leading: IconButton(
+          onPressed: _submitting ? null : () => context.pop(),
+          tooltip: 'Discard',
+          icon: Icon(LucideIcons.x, size: 20, color: palette.textMuted),
         ),
         actions: [
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.only(right: AppSpacing.lg),
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 200),
-                opacity: (isBodyEmpty && !_submitting) ? 0.5 : 1.0,
-                child: AppButton(
-                  text: 'Post',
-                  isLoading: _submitting,
-                  onPressed: (isBodyEmpty || _submitting) ? null : _submit,
+          Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.lg),
+            child: Center(
+              child: _PostButton(
+                enabled: _canPost && !_submitting,
+                submitting: _submitting,
+                onTap: _submit,
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            _IdentityBanner(palette: palette, identity: identity),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.xl,
+                  AppSpacing.lg,
+                  AppSpacing.xl,
+                  AppSpacing.xl,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: _titleController,
+                      style: AppTypography.heading2.copyWith(
+                        color: palette.textPrimary,
+                      ),
+                      maxLines: null,
+                      textInputAction: TextInputAction.next,
+                      textCapitalization: TextCapitalization.sentences,
+                      decoration: InputDecoration(
+                        hintText: 'Title (optional)',
+                        hintStyle: AppTypography.heading2.copyWith(
+                          color: palette.textSubtle,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    TextField(
+                      controller: _bodyController,
+                      autofocus: true,
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontSize: 16,
+                        height: 1.6,
+                        color: palette.textPrimary,
+                      ),
+                      maxLines: null,
+                      keyboardType: TextInputType.multiline,
+                      textCapitalization: TextCapitalization.sentences,
+                      cursorColor: AppColors.primary,
+                      decoration: InputDecoration(
+                        hintText:
+                            'Say it how it is — a win, a rough patch, a question…',
+                        hintStyle: AppTypography.bodyMedium.copyWith(
+                          fontSize: 16,
+                          color: palette.textSubtle,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title Input - Notion style (large, bold)
-                  TextField(
-                    controller: _titleController,
-                    style: AppTypography.heading1.copyWith(
-                       color: AppColors.textPrimary,
-                    ),
-                    maxLines: null,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      hintText: 'Title (optional)',
-                      hintStyle: AppTypography.heading1.copyWith(color: AppColors.textMuted),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-
-                  // Body Input
-                  TextField(
-                    controller: _bodyController,
-                    autofocus: true,
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textPrimary,
-                    ),
-                    maxLines: null,
-                    keyboardType: TextInputType.multiline,
-                    onChanged: (_) => setState(() {}),
-                    decoration: InputDecoration(
-                      hintText: "What's on your mind? Share your progress...",
-                      hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textMuted),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                ],
-              ),
+            _TopicToolbar(
+              palette: palette,
+              selected: _topic,
+              onChanged: (t) => setState(() => _topic = t),
             ),
-          ),
-
-          // Bottom Toolbar for Tags and Moods
-          _buildToolbar(),
-        ],
+          ],
+        ),
       ),
     );
   }
+}
 
-  Widget _buildToolbar() {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: AppColors.backgroundLight)),
+/// Reminds the writer they're safe here — and gives their anonymous
+/// identity a face before they speak.
+class _IdentityBanner extends StatelessWidget {
+  const _IdentityBanner({required this.palette, required this.identity});
+
+  final CommunityPalette palette;
+  final CommunityIdentity identity;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, 0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm + AppSpacing.xxs,
+        ),
+        decoration: BoxDecoration(
+          color: identity.color.withValues(alpha: 0.07),
+          borderRadius: AppRadius.medium,
+        ),
+        child: Row(
+          children: [
+            Avatar(initial: identity.initials, color: identity.color, size: 28),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Text.rich(
+                TextSpan(
+                  text: 'Posting as ',
+                  style: AppTypography.caption.copyWith(
+                    fontSize: 12.5,
+                    color: palette.textMuted,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: identity.name,
+                      style: AppTypography.caption.copyWith(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: palette.textPrimary,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' — always anonymous',
+                      style: AppTypography.caption.copyWith(
+                        fontSize: 12.5,
+                        color: palette.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Icon(LucideIcons.lock, size: 13, color: palette.textSubtle),
+          ],
+        ),
       ),
-      padding: const EdgeInsets.symmetric(vertical: 12),
+    );
+  }
+}
+
+class _PostButton extends StatelessWidget {
+  const _PostButton({
+    required this.enabled,
+    required this.submitting,
+    required this.onTap,
+  });
+
+  final bool enabled;
+  final bool submitting;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 200),
+      opacity: enabled || submitting ? 1 : 0.45,
+      child: Material(
+        color: AppColors.primary,
+        borderRadius: AppRadius.circular,
+        child: InkWell(
+          borderRadius: AppRadius.circular,
+          onTap: enabled
+              ? () {
+                  HapticFeedback.lightImpact();
+                  onTap();
+                }
+              : null,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg + AppSpacing.xs,
+              vertical: AppSpacing.sm + 1,
+            ),
+            child: submitting
+                ? const SizedBox(
+                    width: 15,
+                    height: 15,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation(AppColors.onPrimary),
+                    ),
+                  )
+                : Text(
+                    'Share',
+                    style: AppTypography.button.copyWith(
+                      fontSize: 14,
+                      color: AppColors.onPrimary,
+                    ),
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Topic picker above the keyboard. Client-side only for now — the posts
+/// table has no topic column yet; the feed classifies from text.
+class _TopicToolbar extends StatelessWidget {
+  const _TopicToolbar({
+    required this.palette,
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final CommunityPalette palette;
+  final CommunityTopic? selected;
+  final ValueChanged<CommunityTopic?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: palette.surface,
+        border: Border(top: BorderSide(color: palette.divider)),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Moods row
-          SizedBox(
-            height: 38,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: _moods.map((m) {
-                final isActive = _selectedMood == m;
-                return GestureDetector(
-                  onTap: () => setState(() => _selectedMood = isActive ? null : m),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isActive ? AppColors.primary : AppColors.backgroundLight,
-                      borderRadius: BorderRadius.circular(AppRadius.pill),
-                      border: Border.all(
-                        color: isActive ? AppColors.primary : AppColors.textMuted.withValues(alpha: 0.2),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Text(m.emoji, style: AppTypography.bodyMedium),
-                        const SizedBox(width: AppSpacing.xs),
-                        Text(
-                          m.label,
-                          style: AppTypography.caption.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: isActive ? AppColors.onPrimary : AppColors.textMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+            child: Text(
+              'WHAT KIND OF POST IS THIS?',
+              style: AppTypography.label.copyWith(color: palette.textSubtle),
             ),
           ),
-          const SizedBox(height: 12),
-
-          // Tags row
+          const SizedBox(height: AppSpacing.sm + AppSpacing.xxs),
           SizedBox(
             height: 34,
             child: ListView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: _tags.map((t) {
-                final isSelected = _selectedTag == t;
-                return GestureDetector(
-                  onTap: () => setState(() => _selectedTag = isSelected ? null : t),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: isSelected ? t.bgColor : AppColors.backgroundLight,
-                      borderRadius:BorderRadius.circular( AppRadius.pill),
-                      border: Border.all(
-                        color: isSelected
-                            ? t.textColor.withValues(alpha: 0.4)
-                            : AppColors.textMuted.withValues(alpha: 0.2),
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+              children: [
+                for (final topic in CommunityTopic.values)
+                  if (topic != CommunityTopic.story)
+                    GestureDetector(
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        onChanged(selected == topic ? null : topic);
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        margin: const EdgeInsets.only(right: AppSpacing.sm),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md + 2,
+                        ),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: selected == topic
+                              ? topic.background
+                              : Colors.transparent,
+                          borderRadius: AppRadius.circular,
+                          border: Border.all(
+                            color: selected == topic
+                                ? topic.color.withValues(alpha: 0.35)
+                                : palette.border,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 7,
+                              height: 7,
+                              decoration: BoxDecoration(
+                                color: topic.color,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.sm - 2),
+                            Text(
+                              topic.label,
+                              style: AppTypography.caption.copyWith(
+                                fontSize: 12.5,
+                                fontWeight: selected == topic
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                                color: selected == topic
+                                    ? topic.color
+                                    : palette.textMuted,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    child: Text(
-                      t.label,
-                      style: AppTypography.caption.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: isSelected ? t.textColor : AppColors.textMuted,
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
+              ],
             ),
           ),
         ],

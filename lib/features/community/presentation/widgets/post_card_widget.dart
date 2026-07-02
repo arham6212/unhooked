@@ -1,120 +1,340 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+
 import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_radius.dart';
+import '../../../../core/design_system/tokens/app_shadows.dart';
 import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
 import '../../domain/entities/post.dart';
+import '../styles/community_palette.dart';
+import '../utils/community_identity.dart';
+import '../utils/community_topics.dart';
 import 'avatar_widget.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 
-const double kAvatarSz  = 32.0;
+const _heartColor = Color(0xFFE11D48); // rose — warmer than a thumbs-up
 
-// ── Tag catalogue ───────────────────────────────────────────────
-class _Tag {
-  final String label;
-  final Color dot; 
-  const _Tag(this.label, this.dot);
-}
+/// A voice in the circle: anonymous name, streak, topic, words, support.
+class PostCard extends StatefulWidget {
+  const PostCard({super.key, required this.post, this.isDetail = false});
 
-const _kTags = <_Tag>[
-  _Tag('Motivation', AppColors.primary),
-  _Tag('Struggling', AppColors.error),
-  _Tag('Winning',    AppColors.success),
-  _Tag('Relapse',    AppColors.error),
-  _Tag('Question',   AppColors.primary),
-  _Tag('Milestone',  AppColors.primaryLight),
-];
-
-// ═══════════════════════════════════════════════════════════════
-//  _ActionIcon — YouTube-style action (minimal tap zone)
-// ═══════════════════════════════════════════════════════════════
-class _ActionIcon extends StatefulWidget {
-  const _ActionIcon({
-    required this.icon,
-    required this.activeIcon,
-    this.label,
-    this.count,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final IconData activeIcon;
-  final String? label; 
-  final int? count;
-  final bool isActive;
-  final VoidCallback onTap;
+  final Post post;
+  final bool isDetail;
 
   @override
-  State<_ActionIcon> createState() => _ActionIconState();
+  State<PostCard> createState() => _PostCardState();
 }
 
-class _ActionIconState extends State<_ActionIcon>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-  late final Animation<double> _scale;
+class _PostCardState extends State<PostCard> {
+  bool _hearted = false;
+  bool _expanded = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 120),
-      lowerBound: 0, upperBound: 1,
-    );
-    _scale = Tween<double>(begin: 1.0, end: 1.15).animate(
-      CurvedAnimation(parent: _ctrl, curve: Curves.easeOut),
-    );
+  static const _truncAt = 240;
+
+  String get _ago {
+    final d = DateTime.now().difference(widget.post.createdAt);
+    if (d.inSeconds < 60) return 'just now';
+    if (d.inMinutes < 60) return '${d.inMinutes}m';
+    if (d.inHours < 24) return '${d.inHours}h';
+    if (d.inDays < 7) return '${d.inDays}d';
+    return '${(d.inDays / 7).floor()}w';
   }
 
-  @override
-  void dispose() { _ctrl.dispose(); super.dispose(); }
-
-  void _tap() {
-    HapticFeedback.selectionClick();
-    _ctrl.forward().then((_) => _ctrl.reverse());
-    widget.onTap();
+  void _openDetails() {
+    context.push('/community/post/${widget.post.id}', extra: widget.post);
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: _tap,
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-        child: AnimatedBuilder(
-          animation: _scale,
-          builder: (_, child) =>
-              Transform.scale(scale: _scale.value, child: child),
+    final palette = CommunityPalette.of(context);
+    final identity = CommunityIdentity.fromUserId(widget.post.userId);
+    final topic = topicForPost(widget.post);
+    final streakDay = CommunityIdentity.streakDayFor(widget.post.userId);
+
+    final title = (widget.post.title?.isNotEmpty ?? false) ? widget.post.title : null;
+    final raw = widget.post.body.trim();
+    final long = !widget.isDetail && raw.length > _truncAt;
+    final body = long && !_expanded ? '${raw.substring(0, _truncAt).trimRight()}…' : raw;
+
+    return Semantics(
+      button: !widget.isDetail,
+      label: 'Post by ${identity.name}',
+      child: Material(
+        color: palette.surface,
+        borderRadius: AppRadius.large,
+        child: InkWell(
+          borderRadius: AppRadius.large,
+          onTap: widget.isDetail ? null : _openDetails,
+          child: Ink(
+            decoration: BoxDecoration(
+              borderRadius: AppRadius.large,
+              border: Border.all(color: palette.border),
+              boxShadow: AppShadows.sm,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Identity row ────────────────────────────────
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Avatar(
+                        initial: identity.initials,
+                        color: identity.color,
+                        size: 38,
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              identity.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTypography.bodyMedium.copyWith(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: palette.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Row(
+                              children: [
+                                const Icon(LucideIcons.flame,
+                                    size: 11, color: AppColors.warmAmber),
+                                const SizedBox(width: 3),
+                                Text(
+                                  'Day $streakDay',
+                                  style: AppTypography.caption.copyWith(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.warmAmber,
+                                  ),
+                                ),
+                                Text(
+                                  '  ·  $_ago',
+                                  style: AppTypography.caption.copyWith(
+                                    fontSize: 11.5,
+                                    color: palette.textSubtle,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      _TopicPill(topic: topic),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+
+                  // ── Words ───────────────────────────────────────
+                  if (title != null) ...[
+                    Text(
+                      title,
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w700,
+                        height: 1.35,
+                        color: palette.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                  ],
+                  Text(
+                    body,
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontSize: 14.5,
+                      height: 1.55,
+                      color: palette.textBody,
+                    ),
+                  ),
+                  if (long) ...[
+                    const SizedBox(height: AppSpacing.xs),
+                    GestureDetector(
+                      onTap: () => setState(() => _expanded = !_expanded),
+                      child: Text(
+                        _expanded ? 'Show less' : 'Read more',
+                        style: AppTypography.caption.copyWith(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: AppSpacing.md),
+
+                  // ── Actions ─────────────────────────────────────
+                  Row(
+                    children: [
+                      _ActionPill(
+                        icon: LucideIcons.heart,
+                        count: widget.post.likesCount + (_hearted ? 1 : 0),
+                        active: _hearted,
+                        activeColor: _heartColor,
+                        activeBackground: const Color(0xFFFFF1F2),
+                        palette: palette,
+                        semanticLabel: _hearted ? 'Remove heart' : 'Send a heart',
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          setState(() => _hearted = !_hearted);
+                        },
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      _ActionPill(
+                        icon: LucideIcons.messageCircle,
+                        count: widget.post.commentsCount,
+                        active: false,
+                        activeColor: AppColors.primary,
+                        activeBackground: AppColors.tintBlue,
+                        palette: palette,
+                        semanticLabel: 'Replies',
+                        onTap: widget.isDetail ? null : _openDetails,
+                      ),
+                      const Spacer(),
+                      _PostMenu(palette: palette),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TopicPill extends StatelessWidget {
+  const _TopicPill({required this.topic});
+
+  final CommunityTopic topic;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm + AppSpacing.xxs,
+        vertical: 4,
+      ),
+      decoration: BoxDecoration(
+        color: topic.background,
+        borderRadius: AppRadius.circular,
+      ),
+      child: Text(
+        topic.label,
+        style: AppTypography.caption.copyWith(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: topic.color,
+        ),
+      ),
+    );
+  }
+}
+
+/// Compact action with a springy pop on toggle; fills with flat color
+/// when active.
+class _ActionPill extends StatefulWidget {
+  const _ActionPill({
+    required this.icon,
+    required this.count,
+    required this.active,
+    required this.activeColor,
+    required this.activeBackground,
+    required this.palette,
+    required this.semanticLabel,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final int count;
+  final bool active;
+  final Color activeColor;
+  final Color activeBackground;
+  final CommunityPalette palette;
+  final String semanticLabel;
+  final VoidCallback? onTap;
+
+  @override
+  State<_ActionPill> createState() => _ActionPillState();
+}
+
+class _ActionPillState extends State<_ActionPill>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 240),
+  );
+  late final Animation<double> _scale = TweenSequence<double>([
+    TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.25), weight: 40),
+    TweenSequenceItem(
+      tween: Tween(begin: 1.25, end: 1.0)
+          .chain(CurveTween(curve: Curves.easeOutBack)),
+      weight: 60,
+    ),
+  ]).animate(_ctrl);
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  void _handleTap() {
+    if (widget.onTap == null) return;
+    _ctrl.forward(from: 0);
+    widget.onTap!();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = widget.active ? widget.activeColor : widget.palette.textMuted;
+
+    return Semantics(
+      button: true,
+      label: widget.semanticLabel,
+      child: GestureDetector(
+        onTap: _handleTap,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm - 1,
+          ),
+          decoration: BoxDecoration(
+            color: widget.active ? widget.activeBackground : Colors.transparent,
+            borderRadius: AppRadius.circular,
+            border: Border.all(
+              color: widget.active
+                  ? widget.activeColor.withValues(alpha: 0.25)
+                  : widget.palette.border,
+            ),
+          ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                widget.isActive ? widget.activeIcon : widget.icon,
-                key: ValueKey(widget.isActive),
-                size: 16,
-                color: widget.isActive ? AppColors.primary : AppColors.textPrimary,
+              ScaleTransition(
+                scale: _scale,
+                child: Icon(widget.icon, size: 14, color: color),
               ),
-              if (widget.label != null) ...[
-                const SizedBox(width: AppSpacing.xs),
-                Text(
-                  widget.label!,
-                  style: AppTypography.caption.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textMuted,
-                    height: 1.0,
-                  ),
-                ),
-              ] else if ((widget.count ?? 0) > 0) ...[
-                const SizedBox(width: 4),
+              if (widget.count > 0) ...[
+                const SizedBox(width: AppSpacing.xs + 1),
                 Text(
                   '${widget.count}',
                   style: AppTypography.caption.copyWith(
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textMuted,
-                    height: 1.0,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: color,
+                    fontFeatures: const [FontFeature.tabularFigures()],
                   ),
                 ),
               ],
@@ -126,278 +346,44 @@ class _ActionIconState extends State<_ActionIcon>
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  _PostMenu — minimal 3-dot, aligned top right
-// ═══════════════════════════════════════════════════════════════
 class _PostMenu extends StatelessWidget {
-  const _PostMenu();
+  const _PostMenu({required this.palette});
+
+  final CommunityPalette palette;
 
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
       padding: EdgeInsets.zero,
-      color: Colors.white,
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      icon: const Icon(LucideIcons.moreVertical, size: 16, color: AppColors.textPrimary),
+      color: palette.surface,
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: AppRadius.medium),
+      icon: Icon(LucideIcons.moreHorizontal, size: 16, color: palette.textSubtle),
+      tooltip: 'Post options',
       onSelected: (_) {},
       itemBuilder: (_) => [
-        _item(LucideIcons.flag,           'Report'),
+        _item(LucideIcons.flag, 'Report'),
         _item(LucideIcons.eyeOff, 'Hide'),
-        _item(LucideIcons.link,            'Copy link'),
+        _item(LucideIcons.link, 'Copy link'),
       ],
     );
   }
 
-  PopupMenuItem<String> _item(IconData ic, String txt) => PopupMenuItem(
-    value: txt,
-    height: 40,
-    child: Row(children: [
-      Icon(ic, size: 18, color: AppColors.textPrimary),
-      const SizedBox(width: AppSpacing.md),
-      Text(txt, style: AppTypography.bodyMedium),
-    ]),
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  PostCard — Exact YouTube layout
-// ═══════════════════════════════════════════════════════════════
-class PostCard extends StatefulWidget {
-  const PostCard({super.key, required this.post, this.isDetail = false});
-  final Post post;
-  final bool isDetail;
-
-  @override
-  State<PostCard> createState() => _PostCardState();
-}
-
-class _PostCardState extends State<PostCard> {
-  bool _liked    = false;
-  bool _expanded = false;
-
-  static const int _truncAt = 220;
-
-  Color get _avatarColor => AppColors.avatarPalette[
-      widget.post.userId.hashCode.abs() % AppColors.avatarPalette.length];
-
-  String get _initial =>
-      widget.post.userId.isEmpty ? '?' : widget.post.userId[0].toUpperCase();
-
-  String get _ago {
-    final d = DateTime.now().difference(widget.post.createdAt);
-    if (d.inSeconds < 60)  return 'now';
-    if (d.inMinutes < 60)  return '${d.inMinutes} minutes ago';
-    if (d.inHours < 24)    return '${d.inHours} hours ago';
-    if (d.inDays < 7)      return '${d.inDays} days ago';
-    return '${(d.inDays / 7).floor()} weeks ago';
-  }
-
-  int get _streak => (widget.post.userId.hashCode.abs() % 90) + 1;
-
-  _Tag? get _tag {
-    final i = widget.post.body.hashCode.abs() % (_kTags.length + 2);
-    return i < _kTags.length ? _kTags[i] : null;
-  }
-
-  int get _likes => widget.post.likesCount + (_liked ? 1 : 0);
-
-  @override
-  Widget build(BuildContext context) {
-    final title = (widget.post.title?.isNotEmpty ?? false)
-        ? widget.post.title!
-        : null;
-    final raw  = widget.post.body;
-    final long = raw.length > _truncAt;
-    final body = (long && !_expanded)
-        ? '${raw.substring(0, _truncAt)}...'
-        : raw;
-    final tag  = _tag;
-
-    return InkWell(
-      onTap: widget.isDetail ? null : () => context.push('/community/post/${widget.post.id}', extra: widget.post),
-      splashColor: Colors.black.withValues(alpha: 0.05),
-      highlightColor: Colors.black.withValues(alpha: 0.05),
-      child: Container(
-        color: AppColors.surface,
-        child: Column(
+  PopupMenuItem<String> _item(IconData icon, String label) => PopupMenuItem(
+        value: label,
+        height: 40,
+        child: Row(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.md),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                  // 1. Avatar (Left Column)
-                  Avatar(
-                    initial: _initial,
-                    color: _avatarColor,
-                    size: kAvatarSz,
-                  ),
-
-                  const SizedBox(width: AppSpacing.md),
-
-                  // 2. Content (Right Column)
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Header Row: Username + Meta + Menu
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 1), // Align with avatar center visually
-                                child: Text.rich(
-                                  TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: '@anonymous   ',
-                                        style: AppTypography.caption.copyWith(
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColors.textPrimary,
-                                        ),
-                                      ),
-                                      // Extremely subtle streak & time
-                                      TextSpan(
-                                        text: '🔥 Day $_streak   •   $_ago',
-                                        style: AppTypography.caption.copyWith(
-                                          fontWeight: FontWeight.w400,
-                                          color: AppColors.textMuted,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            // 3 Dots Menu
-                            const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: Align(
-                                alignment: Alignment.topRight,
-                                child: _PostMenu(),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 4),
-
-                        // Body Content
-                        if (title != null) ...[
-                          Text(
-                            title,
-                            style: AppTypography.bodyMedium.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                              height: 1.4,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                        ],
-
-                        Text(
-                          body,
-                          style: AppTypography.bodyMedium.copyWith(
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.textPrimary,
-                            height: 1.4,
-                          ),
-                        ),
-
-                        // Read more inline
-                        if (long) ...[
-                          const SizedBox(height: 2),
-                          GestureDetector(
-                            onTap: () => setState(() => _expanded = !_expanded),
-                            child: Text(
-                              _expanded ? 'Show less' : 'Read more',
-                              style: AppTypography.caption.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textMuted,
-                              ),
-                            ),
-                          ),
-                        ],
-
-                        // Subtler Tag (Notion / YT blend)
-                        if (tag != null) ...[
-                          const SizedBox(height: 6),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 6,
-                                height: 6,
-                                decoration: BoxDecoration(
-                                  color: tag.dot.withValues(alpha: 0.6),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: AppSpacing.xs),
-                              Text(
-                                tag.label,
-                                style: AppTypography.caption.copyWith(
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.textMuted,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-
-                        const SizedBox(height: 8),
-
-                        // Action Row (Spacing perfectly tight)
-                        Row(
-                          children: [
-                            _ActionIcon(
-                              icon: LucideIcons.thumbsUp,
-                              activeIcon: LucideIcons.thumbsUp,
-                              count: _likes,
-                              isActive: _liked,
-                              onTap: () => setState(() => _liked = !_liked),
-                            ),
-                            const SizedBox(width: 16),
-
-                            _ActionIcon(
-                              icon: LucideIcons.messageCircle,
-                              activeIcon: LucideIcons.messageCircle,
-                              count: widget.post.commentsCount,
-                              isActive: false,
-                              onTap: widget.isDetail ? () {} : () => context.push('/community/post/${widget.post.id}', extra: widget.post),
-                            ),
-                            const SizedBox(width: 16),
-
-                            _ActionIcon(
-                              icon: LucideIcons.share2,
-                              activeIcon: LucideIcons.share2,
-                              label: null,
-                              isActive: false,
-                              onTap: () {},
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+            Icon(icon, size: 16, color: palette.textMuted),
+            const SizedBox(width: AppSpacing.md),
+            Text(
+              label,
+              style: AppTypography.bodyMedium.copyWith(
+                fontSize: 14,
+                color: palette.textPrimary,
               ),
-            ),
-
-            Divider(
-              height: 1,
-              thickness: 0.5,
-              color: AppColors.textMuted.withValues(alpha: 0.12),
-              indent: kAvatarSz + AppSpacing.md + AppSpacing.lg, // Lines up exactly with content
-              endIndent: AppSpacing.lg,
             ),
           ],
         ),
-      ),
-    );
-  }
+      );
 }

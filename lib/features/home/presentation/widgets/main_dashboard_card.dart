@@ -3,7 +3,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/design_system/tokens/app_colors.dart';
 import '../../../../core/design_system/tokens/app_spacing.dart';
 import '../../../../core/design_system/tokens/app_typography.dart';
-import '../../../../core/design_system/tokens/app_radius.dart';
 import 'relapse_heatmap.dart';
 
 class MainDashboardCard extends StatelessWidget {
@@ -13,51 +12,63 @@ class MainDashboardCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: AppRadius.extraLarge,
+        color: Colors.white.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.6), width: 1),
         boxShadow: [
           BoxShadow(
-            color: AppColors.textPrimary.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: AppColors.primary.withValues(alpha: 0.06),
+            blurRadius: 40,
+            offset: const Offset(0, 12),
+          ),
+          BoxShadow(
+            color: AppColors.textPrimary.withValues(alpha: 0.03),
+            blurRadius: 8,
           ),
         ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ── Top row: Streak info + Heatmap ──
-                Row(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xl, AppSpacing.xl, 0),
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Left: streak
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'CURRENT STREAK',
-                            style: AppTypography.label.copyWith(
-                              color: AppColors.textMuted,
-                              letterSpacing: 1.0,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.textSubtle,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 11,
+                              letterSpacing: 0.8,
                             ),
                           ),
-                          const SizedBox(height: AppSpacing.xxs),
+                          const SizedBox(height: AppSpacing.sm),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.baseline,
                             textBaseline: TextBaseline.alphabetic,
                             children: [
-                              Text(
-                                '12',
-                                style: AppTypography.display.copyWith(
-                                  color: AppColors.primary,
-                                  fontSize: 56,
-                                  height: 1.0,
+                              ShaderMask(
+                                shaderCallback: (bounds) => const LinearGradient(
+                                  colors: [AppColors.primaryDark, AppColors.primary, AppColors.primaryLight],
+                                  stops: [0.0, 0.5, 1.0],
+                                ).createShader(bounds),
+                                child: Text(
+                                  '12',
+                                  style: AppTypography.display.copyWith(
+                                    color: Colors.white,
+                                    fontSize: 62,
+                                    height: 1.0,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: AppSpacing.sm),
@@ -65,134 +76,120 @@ class MainDashboardCard extends StatelessWidget {
                                 'days',
                                 style: AppTypography.heading3.copyWith(
                                   color: AppColors.textPrimary,
-                                  fontWeight: FontWeight.w700,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 20,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: AppSpacing.xs),
+                          const SizedBox(height: AppSpacing.lg),
                           Row(
                             children: [
-                              const Icon(LucideIcons.shieldCheck, size: 16, color: AppColors.primary),
-                              const SizedBox(width: AppSpacing.xs),
+                              Icon(LucideIcons.shield, size: 16, color: AppColors.primary),
+                              const SizedBox(width: AppSpacing.sm),
                               Text(
                                 'Discipline Level 2',
-                                style: AppTypography.caption.copyWith(color: AppColors.textMuted),
+                                style: AppTypography.bodyMedium.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: AppColors.textPrimary,
+                                ),
                               ),
                             ],
                           ),
                           const SizedBox(height: AppSpacing.md),
                           _buildProgressBar(),
-                          const SizedBox(height: AppSpacing.xxs),
+                          const SizedBox(height: AppSpacing.sm),
                           Text(
                             'Next level in 3 days',
-                            style: AppTypography.caption.copyWith(color: AppColors.textMuted, fontSize: 11),
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          // Momentum banner
-                          Container(
-                            padding: const EdgeInsets.all(AppSpacing.sm),
-                            decoration: BoxDecoration(
-                              color: AppColors.background,
-                              borderRadius: AppRadius.large,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(7),
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.primary,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(LucideIcons.trendingUp, size: 12, color: AppColors.onPrimary),
-                                ),
-                                const SizedBox(width: AppSpacing.sm),
-                                Flexible(
-                                  child: Text(
-                                    "You're building\nreal momentum.",
-                                    style: AppTypography.caption.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      height: 1.3,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.textSubtle,
+                              fontSize: 12,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: AppSpacing.md),
-                    // Right: heatmap
+                    const SizedBox(width: AppSpacing.lg),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
                           'Last 30 days',
-                          style: AppTypography.caption.copyWith(color: AppColors.textMuted),
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.textSubtle,
+                            fontSize: 12,
+                          ),
                         ),
-                        const SizedBox(height: AppSpacing.sm),
+                        const SizedBox(height: AppSpacing.md),
                         const RelapseHeatmap(),
-                        const SizedBox(height: AppSpacing.sm),
+                        const SizedBox(height: AppSpacing.md),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            _buildLegendItem(AppColors.success, 'Clean'),
-                            const SizedBox(width: AppSpacing.md),
-                            _buildLegendItem(AppColors.error, 'Relapsed'),
+                            _buildLegendItem(AppColors.successMuted, 'Clean'),
+                            const SizedBox(width: AppSpacing.lg),
+                            _buildLegendItem(AppColors.errorMuted, 'Relapsed'),
                           ],
                         ),
                       ],
                     ),
                   ],
                 ),
-
-                const SizedBox(height: AppSpacing.lg),
-
-                // ── Bottom: Time Reclaimed ──
-                Text(
-                  'TIME RECLAIMED',
-                  style: AppTypography.label.copyWith(
-                    color: AppColors.primary,
-                    letterSpacing: 1.0,
-                  ),
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.xl),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceSunken.withValues(alpha: 0.5),
                 ),
-                const SizedBox(height: AppSpacing.xs),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildTimeBlock('12', 'd'),
-                    _buildTimeColon(),
-                    _buildTimeBlock('06', 'h'),
-                    _buildTimeColon(),
-                    _buildTimeBlock('36', 'm'),
-                    _buildTimeColon(),
-                    _buildTimeBlock('54', 's'),
+                    Text(
+                      'TIME RECLAIMED',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 11,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Row(
+                      children: [
+                        _buildTimeBlock('12', 'd'),
+                        _buildTimeSep(),
+                        _buildTimeBlock('06', 'h'),
+                        _buildTimeSep(),
+                        _buildTimeBlock('36', 'm'),
+                        _buildTimeSep(),
+                        _buildTimeBlock('54', 's'),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      'You\'ve saved ~18 hours',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.textSubtle,
+                        fontSize: 12,
+                      ),
+                    ),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.xxs),
-                Text(
-                  "You've saved ~18 hours",
-                  style: AppTypography.caption.copyWith(color: AppColors.textMuted),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-          // Monk image
           Positioned(
-            right: -20,
-            bottom: -20,
+            right: -5,
+            bottom: -5,
             child: IgnorePointer(
-              child: ClipRRect(
-                borderRadius: AppRadius.extraLarge,
-                child: Image.asset(
-                  'assets/images/meditating_monk.png',
-                  width: 160,
-                  height: 160,
-                  fit: BoxFit.cover,
-                ),
+              child: Image.asset(
+                'assets/images/meditating_monk.png',
+                width: 190,
+                height: 190,
+                fit: BoxFit.contain,
               ),
             ),
           ),
@@ -204,18 +201,19 @@ class MainDashboardCard extends StatelessWidget {
   Widget _buildProgressBar() {
     return Container(
       height: 6,
-      width: 140,
       decoration: BoxDecoration(
-        color: AppColors.border,
-        borderRadius: BorderRadius.circular(4),
+        color: AppColors.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(3),
       ),
       child: FractionallySizedBox(
         alignment: Alignment.centerLeft,
         widthFactor: 0.6,
         child: Container(
           decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(4),
+            gradient: const LinearGradient(
+              colors: [AppColors.primaryDark, AppColors.primary],
+            ),
+            borderRadius: BorderRadius.circular(3),
           ),
         ),
       ),
@@ -228,15 +226,15 @@ class MainDashboardCard extends StatelessWidget {
         Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 5),
         Text(
           label,
-          style: AppTypography.caption.copyWith(color: AppColors.textMuted),
+          style: AppTypography.caption.copyWith(
+            color: AppColors.textSubtle,
+            fontSize: 11,
+          ),
         ),
       ],
     );
@@ -250,32 +248,33 @@ class MainDashboardCard extends StatelessWidget {
         Text(
           value,
           style: AppTypography.heading2.copyWith(
-            fontWeight: FontWeight.w600,
-            fontSize: 24,
+            fontWeight: FontWeight.w800,
+            fontSize: 28,
             color: AppColors.textPrimary,
+            letterSpacing: -0.5,
           ),
         ),
         Text(
           unit,
           style: AppTypography.caption.copyWith(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w500,
             fontSize: 14,
-            color: AppColors.textPrimary,
+            color: AppColors.textSubtle,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildTimeColon() {
+  Widget _buildTimeSep() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Text(
         ':',
         style: AppTypography.heading2.copyWith(
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w400,
           fontSize: 24,
-          color: AppColors.textPrimary,
+          color: AppColors.textSubtle,
         ),
       ),
     );

@@ -1,32 +1,48 @@
 import 'package:flutter/material.dart';
-import '../../domain/entities/post.dart';
-import '../widgets/post_card_widget.dart';
-import '../../../../core/design_system/tokens/app_colors.dart';
-import '../../../../core/design_system/tokens/app_spacing.dart';
-import '../../../../core/design_system/tokens/app_typography.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-class PostDetailsPage extends StatefulWidget {
+import '../../../../core/design_system/tokens/app_colors.dart';
+import '../../../../core/design_system/tokens/app_radius.dart';
+import '../../../../core/design_system/tokens/app_spacing.dart';
+import '../../../../core/design_system/tokens/app_typography.dart';
+import '../../domain/entities/post.dart';
+import '../providers/posts_provider.dart';
+import '../styles/community_palette.dart';
+import '../utils/community_identity.dart';
+import '../widgets/avatar_widget.dart';
+import '../widgets/post_card_widget.dart';
+
+class PostDetailsPage extends ConsumerStatefulWidget {
+  const PostDetailsPage({super.key, required this.postId, this.post});
+
   final String postId;
   final Post? post;
 
-  const PostDetailsPage({super.key, required this.postId, this.post});
-
   @override
-  State<PostDetailsPage> createState() => _PostDetailsPageState();
+  ConsumerState<PostDetailsPage> createState() => _PostDetailsPageState();
 }
 
-class _PostDetailsPageState extends State<PostDetailsPage> {
-  late final List<Post> _mockReplies;
+class _PostDetailsPageState extends ConsumerState<PostDetailsPage> {
+  final _replyController = TextEditingController();
+  bool _canSend = false;
+  late final List<Post> _replies;
 
   @override
   void initState() {
     super.initState();
-    _mockReplies = [
+    _replyController.addListener(() {
+      final can = _replyController.text.trim().isNotEmpty;
+      if (can != _canSend) setState(() => _canSend = can);
+    });
+    // Mock replies until a comments table exists.
+    _replies = [
       Post(
         id: 'reply1',
         userId: 'user_a',
-        body: 'Keep going! Every single day makes you stronger. 💪',
+        body: 'Keep going! Every single day makes you stronger.',
         likesCount: 12,
         commentsCount: 0,
         createdAt: DateTime.now().subtract(const Duration(minutes: 42)),
@@ -34,7 +50,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
       Post(
         id: 'reply2',
         userId: 'user_b',
-        body: 'I relate to this so much man, staying strong with you.',
+        body: 'I relate to this so much, staying strong with you.',
         likesCount: 4,
         commentsCount: 0,
         createdAt: DateTime.now().subtract(const Duration(hours: 2)),
@@ -51,124 +67,311 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
   }
 
   @override
+  void dispose() {
+    _replyController.dispose();
+    super.dispose();
+  }
+
+  void _sendReply() {
+    final text = _replyController.text.trim();
+    if (text.isEmpty) return;
+    HapticFeedback.lightImpact();
+    final myId =
+        ref.read(supabaseClientProvider).auth.currentUser?.id ?? 'me-local';
+    setState(() {
+      _replies.add(
+        Post(
+          id: 'local-${DateTime.now().microsecondsSinceEpoch}',
+          userId: myId,
+          body: text,
+          likesCount: 0,
+          commentsCount: 0,
+          createdAt: DateTime.now(),
+        ),
+      );
+      _replyController.clear();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (widget.post == null) {
+    final palette = CommunityPalette.of(context);
+    final post = widget.post;
+
+    if (post == null) {
       return Scaffold(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark ? AppColors.backgroundDark : AppColors.background,
-        body: const Center(child: Text("Post not found")),
+        backgroundColor: palette.background,
+        appBar: AppBar(
+          backgroundColor: palette.background,
+          elevation: 0,
+          iconTheme: IconThemeData(color: palette.textPrimary),
+        ),
+        body: Center(
+          child: Text(
+            'This post is no longer here.',
+            style: AppTypography.bodyMedium.copyWith(color: palette.textMuted),
+          ),
+        ),
       );
     }
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: palette.background,
       appBar: AppBar(
         title: Text(
-          'Discussion',
-          style: AppTypography.heading3.copyWith(
-            color: isDark ? Colors.white : AppColors.textPrimary,
-            fontWeight: FontWeight.w600
-          ),
+          'Thread',
+          style: AppTypography.heading3.copyWith(color: palette.textPrimary),
         ),
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        centerTitle: true,
+        backgroundColor: palette.background,
         elevation: 0,
-        iconTheme: IconThemeData(color: isDark ? Colors.white : AppColors.textPrimary),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(
-            color: isDark ? AppColors.borderDark : AppColors.textMuted.withValues(alpha: 0.12),
-            height: 1.0,
-          ),
-        ),
+        scrolledUnderElevation: 0,
+        iconTheme: IconThemeData(color: palette.textPrimary),
       ),
       body: Column(
         children: [
           Expanded(
             child: ListView(
-              padding: EdgeInsets.zero,
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg + AppSpacing.xs,
+                AppSpacing.xs,
+                AppSpacing.lg + AppSpacing.xs,
+                AppSpacing.xl,
+              ),
               children: [
-                // Top-Level Comment (The Post)
-                PostCard(post: widget.post!, isDetail: true),
-                
-                // Replies
-                ..._mockReplies.map((reply) => Padding(
-                      padding: const EdgeInsets.only(left: AppSpacing.xl),
-                      child: PostCard(post: reply, isDetail: true),
-                    )),
+                PostCard(post: post, isDetail: true),
+                const SizedBox(height: AppSpacing.xl),
+                Row(
+                  children: [
+                    Text(
+                      'REPLIES',
+                      style: AppTypography.label.copyWith(color: palette.textSubtle),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.tintBlue,
+                        borderRadius: AppRadius.circular,
+                      ),
+                      child: Text(
+                        '${_replies.length}',
+                        style: AppTypography.caption.copyWith(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primaryDark,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
+                for (final (i, reply) in _replies.indexed)
+                  _ReplyTile(
+                    reply: reply,
+                    isLast: i == _replies.length - 1,
+                    palette: palette,
+                  ),
               ],
             ),
           ),
-          
-          _buildReplyInput(isDark),
+          _ReplyInput(
+            palette: palette,
+            controller: _replyController,
+            canSend: _canSend,
+            onSend: _sendReply,
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildReplyInput(bool isDark) {
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-    final paddingBottom = bottomInset > 0 ? 10.0 : MediaQuery.of(context).padding.bottom + 10.0;
+/// A reply hanging off the thread line — small avatar, name, words.
+class _ReplyTile extends StatelessWidget {
+  const _ReplyTile({
+    required this.reply,
+    required this.isLast,
+    required this.palette,
+  });
 
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
-        border: Border(top: BorderSide(color: isDark ? AppColors.borderDark : AppColors.border, width: 1.0)),
-      ),
-      padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.sm, paddingBottom),
+  final Post reply;
+  final bool isLast;
+  final CommunityPalette palette;
+
+  String get _ago {
+    final d = DateTime.now().difference(reply.createdAt);
+    if (d.inSeconds < 60) return 'just now';
+    if (d.inMinutes < 60) return '${d.inMinutes}m';
+    if (d.inHours < 24) return '${d.inHours}h';
+    return '${d.inDays}d';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final identity = CommunityIdentity.fromUserId(reply.userId);
+
+    return IntrinsicHeight(
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-            child: CircleAvatar(
-              radius: 18,
-              backgroundColor: AppColors.primary,
-              child: Text(
-                'Y', 
-                style: AppTypography.bodyMedium.copyWith(color: AppColors.onPrimary),
-              ), 
+          // Thread spine.
+          SizedBox(
+            width: 30,
+            child: Column(
+              children: [
+                Avatar(initial: identity.initials, color: identity.color, size: 28),
+                if (!isLast)
+                  Expanded(
+                    child: VerticalDivider(
+                      width: 1,
+                      thickness: 1.5,
+                      color: palette.divider,
+                    ),
+                  ),
+              ],
             ),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(bottom: isLast ? 0 : AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          identity.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.caption.copyWith(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: palette.textPrimary,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '  ·  $_ago',
+                        style: AppTypography.caption.copyWith(
+                          fontSize: 11.5,
+                          color: palette.textSubtle,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    reply.body,
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontSize: 14,
+                      height: 1.5,
+                      color: palette.textBody,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn(duration: 300.ms);
+  }
+}
+
+class _ReplyInput extends StatelessWidget {
+  const _ReplyInput({
+    required this.palette,
+    required this.controller,
+    required this.canSend,
+    required this.onSend,
+  });
+
+  final CommunityPalette palette;
+  final TextEditingController controller;
+  final bool canSend;
+  final VoidCallback onSend;
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final paddingBottom =
+        bottomInset > 0 ? 10.0 : MediaQuery.of(context).padding.bottom + 10.0;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: palette.surface,
+        border: Border(top: BorderSide(color: palette.divider)),
+      ),
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.md,
+        AppSpacing.md,
+        paddingBottom,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Expanded(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.sm,
+              ),
               decoration: BoxDecoration(
-                color: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: isDark ? AppColors.borderDark : AppColors.border),
+                color: palette.background,
+                borderRadius: BorderRadius.circular(AppRadius.xl),
+                border: Border.all(color: palette.border),
               ),
               child: TextField(
+                controller: controller,
+                maxLines: 4,
+                minLines: 1,
+                textCapitalization: TextCapitalization.sentences,
+                style: AppTypography.bodyMedium.copyWith(
+                  fontSize: 14.5,
+                  color: palette.textPrimary,
+                ),
                 decoration: InputDecoration(
                   isDense: true,
-                  hintText: 'Add a reply...',
+                  hintText: 'Add a kind word…',
                   hintStyle: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textMuted,
+                    fontSize: 14.5,
+                    color: palette.textSubtle,
                   ),
                   border: InputBorder.none,
                 ),
-                style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.white : AppColors.textPrimary),
-                maxLines: 4,
-                minLines: 1,
               ),
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 4),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                icon: const Icon(
-                  LucideIcons.send, 
-                  color: AppColors.onPrimary,
-                  size: 18
+          Semantics(
+            button: true,
+            label: 'Send reply',
+            child: AnimatedScale(
+              scale: canSend ? 1 : 0.92,
+              duration: const Duration(milliseconds: 180),
+              child: Material(
+                color: canSend ? AppColors.primary : palette.divider,
+                shape: const CircleBorder(),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: canSend ? onSend : null,
+                  child: SizedBox(
+                    width: 42,
+                    height: 42,
+                    child: Icon(
+                      LucideIcons.send,
+                      size: 17,
+                      color: canSend ? AppColors.onPrimary : palette.textSubtle,
+                    ),
+                  ),
                 ),
-                onPressed: () {},
               ),
             ),
           ),

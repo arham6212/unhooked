@@ -89,6 +89,28 @@ class AppTypography {
     letterSpacing: -0.1,
   );
 
+  // Serif — the app's emotional voice (intro/onboarding only).
+  // Inter operates the interface; Fraunces speaks to the person.
+  static const String serifFamily = 'Fraunces';
+
+  static const TextStyle serifDisplay = TextStyle(
+    fontFamily: serifFamily,
+    fontSize: 34,
+    fontWeight: FontWeight.w400,
+    color: AppColors.introText,
+    height: 1.18,
+    letterSpacing: -0.4,
+  );
+
+  static const TextStyle serifTitle = TextStyle(
+    fontFamily: serifFamily,
+    fontSize: 26,
+    fontWeight: FontWeight.w500,
+    color: AppColors.introText,
+    height: 1.25,
+    letterSpacing: -0.2,
+  );
+
   // Mono — for timer digits
   static const TextStyle mono = TextStyle(
     fontFamily: 'Courier',

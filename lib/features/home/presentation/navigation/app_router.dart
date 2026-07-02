@@ -5,12 +5,14 @@ import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/providers/auth_state.dart';
 import '../../../auth/presentation/screens/login_screen.dart';
-import '../../../auth/presentation/screens/onboarding_screen.dart';
+import '../../../onboarding/presentation/providers/onboarding_controller.dart';
+import '../../../onboarding/presentation/screens/onboarding_flow_screen.dart';
 
 import '../../../community/presentation/screens/community_screen.dart';
 import '../../../community/presentation/screens/post_details_page.dart';
 import '../../../community/presentation/screens/create_post_screen.dart';
 import '../../../community/domain/entities/post.dart';
+import '../../../journals/presentation/screens/journal_editor_screen.dart';
 import '../../../journals/presentation/screens/journals_screen.dart';
 import '../../../meditation/presentation/screens/meditation_screen.dart';
 import '../../../meditation/presentation/screens/meditation_session_screen.dart';
@@ -32,6 +34,11 @@ final routerProvider = Provider<GoRouter>((ref) {
     authNotifier.value++;
   });
 
+  // 🔄 Refresh router when onboarding completes
+  ref.listen<OnboardingState>(onboardingProvider, (prev, next) {
+    if (prev?.completed != next.completed) authNotifier.value++;
+  });
+
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
 
@@ -45,7 +52,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final authState = ref.read(authProvider);
 
       final isLoggedIn = authState.isLoggedIn;
-      final isOnboardingDone = authState.hasCompletedOnboarding;
+      final isOnboardingDone = ref.read(onboardingProvider).completed;
 
       final location = state.uri.path;
 
@@ -91,7 +98,20 @@ final routerProvider = Provider<GoRouter>((ref) {
       // 🔹 Onboarding
       GoRoute(
         path: '/onboarding',
-        builder: (context, state) => const OnboardingScreen(),
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          transitionDuration: const Duration(milliseconds: 500),
+          child: const OnboardingFlowScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+              opacity: CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
+              ),
+              child: child,
+            );
+          },
+        ),
       ),
 
       // 🔹 Login
@@ -122,6 +142,41 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/journal',
                 builder: (context, state) => const JournalScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'write',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    pageBuilder: (context, state) {
+                      final args = state.extra as JournalEditorArgs?;
+                      return CustomTransitionPage<void>(
+                        key: state.pageKey,
+                        fullscreenDialog: true,
+                        transitionDuration: const Duration(milliseconds: 380),
+                        reverseTransitionDuration:
+                            const Duration(milliseconds: 300),
+                        child: JournalEditorScreen(args: args),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          final curved = CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeOutCubic,
+                            reverseCurve: Curves.easeInCubic,
+                          );
+                          return FadeTransition(
+                            opacity: curved,
+                            child: SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(0, 0.04),
+                                end: Offset.zero,
+                              ).animate(curved),
+                              child: child,
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
